@@ -4,7 +4,7 @@
 | Nombre y Apellidos | Correo URJC | Usuario GitHub |
 |:--- |:--- |:--- |
 | David Gutiérrez Oviedo | d.gutierrezo.2023@alumnos.urjc.es | davidgutierrezovi18 |
-| Mari Luz Charfolé Maestro | ml.charfole.2024]@alumnos.urjc.es | [User2] |
+| Mari Luz Charfolé Maestro | ml.charfole.2024@alumnos.urjc.es | Mluzcm |
 | Hugo Rus González | h.rus.2023@alumnos.urjc.es | hurg05 |
 | [Nombre 4] | [email4]@alumnos.urjc.es | [User4] |
 
