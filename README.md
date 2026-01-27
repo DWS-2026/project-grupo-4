@@ -6,7 +6,7 @@
 | David Gutiérrez Oviedo | d.gutierrezo.2023@alumnos.urjc.es | davidgutierrezovi18 |
 | Mari Luz Charfolé Maestro | ml.charfole.2024@alumnos.urjc.es | Mluzcm |
 | Hugo Rus González | h.rus.2023@alumnos.urjc.es | hurg05 |
-| [Nombre 4] | [email4]@alumnos.urjc.es | [User4] |
+| Nerea Sanz Sobrados | n.sanz.2024@alumnos.urjc.es | nsanz2024 |
 
 ---
 
