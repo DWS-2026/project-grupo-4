@@ -10,7 +10,7 @@
 
 ---
 
-PRUEBA_H
+
 
 ## 🎭 **Preparación: Definición del Proyecto**
 
