@@ -41,19 +41,24 @@ Viaje - Plan de Viaje: Un viaje puede tener un plan asociado con ficheros o nota
 
 ### **Permisos de los Usuarios**
 Usuario Anónimo:
+
    Permisos: Visualización de destinos y valoraciones públicas, búsqueda de destinos.
    No es dueño de ninguna entidad.
 
 Usuario Registrado:
+
    Permisos: Crear, editar y borrar sus propios viajes y valoraciones; subir fotos y planes de viaje;    personalizar perfil.
    Es dueño de: Sus propios viajes, valoraciones, planes de viaje y perfil de usuario.
 
 Administrador:
+
    Permisos: Gestión completa de usuarios, destinos, viajes y valoraciones; moderación de contenido.
    Es dueño de: Todos los viajes, valoraciones, destinos y usuarios.
 
 Imágenes
+
    Usuario: Avatar o foto de perfil.
+   
    Destino: Imagen representativa del destino.
 
 Viaje: Múltiples fotos asociadas al viaje.
