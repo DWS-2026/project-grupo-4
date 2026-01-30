@@ -17,17 +17,27 @@ Nuestra idea es una aplicación web de gestión de viajes personales. Permite a 
 
 ### **Entidades**
 -Usuario: Representa a los usuarios de la web (registrados y administrador).
+
 -Destino: Lugares o ciudades a los que los usuarios pueden viajar y valorar.
+
 -Viaje: Registro de un viaje realizado o planificado por un usuario a un destino, cada viaje tendrá un fichero pdf con el intinerario del viaje.
+
 -Valoración: Opiniones de los usuarios sobre los destinos, incluyendo puntuación y comentarios (Los comentarios tendrán texto enriquecido).
 
 
+
 **Relaciones entre entidades:**
+
 Usuario - Viaje: Un usuario puede tener múltiples viajes (1:N).
+
 Viaje - Destino: Un viaje pertenece a un destino específico (N:1).
+
 Usuario - Valoración: Un usuario puede valorar múltiples destinos (1:N).
+
 Destino - Valoración: Un destino puede tener múltiples valoraciones (1:N).
+
 Viaje - Plan de Viaje: Un viaje puede tener un plan asociado con ficheros o notas (1:1).
+
 
 ### **Permisos de los Usuarios**
 Usuario Anónimo:
