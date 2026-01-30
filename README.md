@@ -11,7 +11,7 @@
 ---
 
 ## 🎭 **Preparación: Definición del Proyecto**
-
+...
 ### **Descripción del Tema**
 Nuestra idea es una aplicación web de gestión de viajes personales. Permite a los usuarios registrar los viajes que han realizado, planificar futuros viajes, subir fotos y documentos de itinerarios, y valorar destinos turísticos. La plataforma ayuda a los usuarios a organizar sus experiencias de viaje y compartir opiniones con otros usuarios, fomentando la planificación y el descubrimiento de nuevos destinos.
 
