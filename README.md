@@ -263,7 +263,7 @@ Diagrama de clases de la aplicación con diferenciación por colores o secciones
 > Vídeo mostrando las principales funcionalidades de la aplicación web.
 
 ### **Documentación de la API REST**
-
+jkl
 #### **Especificación OpenAPI**
 📄 **[Especificación OpenAPI (YAML)](/api-docs/api-docs.yaml)**
 
