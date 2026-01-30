@@ -16,15 +16,15 @@
 Nuestra idea es una aplicación web de gestión de viajes personales. Permite a los usuarios registrar los viajes que han realizado, planificar futuros viajes, subir fotos y documentos de itinerarios, y valorar destinos turísticos. La plataforma ayuda a los usuarios a organizar sus experiencias de viaje y compartir opiniones con otros usuarios, fomentando la planificación y el descubrimiento de nuevos destinos.
 
 ### **Entidades**
-Usuario: Representa a los usuarios de la web (registrados y administrador).
+-Usuario: Representa a los usuarios de la web (registrados y administrador).
 
-Destino: Lugares o ciudades a los que los usuarios pueden viajar y valorar.
+-Destino: Lugares o ciudades a los que los usuarios pueden viajar y valorar.
 
-Viaje: Registro de un viaje realizado o planificado por un usuario a un destino.
+-Viaje: Registro de un viaje realizado o planificado por un usuario a un destino.
 
-Valoración: Opiniones de los usuarios sobre los destinos, incluyendo puntuación y comentarios.
+-Valoración: Opiniones de los usuarios sobre los destinos, incluyendo puntuación y comentarios.
 
-Plan de Viaje (opcional para práctica 3): Documento asociado a un viaje con itinerarios, PDF o notas en texto enriquecido.
+-Plan de Viaje (opcional para práctica 3): Documento asociado a un viaje con itinerarios, PDF o notas en texto    enriquecido.
 
 **Relaciones entre entidades:**
 Usuario - Viaje: Un usuario puede tener múltiples viajes (1:N).
@@ -40,27 +40,27 @@ Viaje - Plan de Viaje: Un viaje puede tener un plan asociado con ficheros o nota
 ### **Permisos de los Usuarios**
 Usuario Anónimo:
 
-Permisos: Visualización de destinos y valoraciones públicas, búsqueda de destinos.
+   Permisos: Visualización de destinos y valoraciones públicas, búsqueda de destinos.
 
-No es dueño de ninguna entidad.
+   No es dueño de ninguna entidad.
 
 Usuario Registrado:
 
-Permisos: Crear, editar y borrar sus propios viajes y valoraciones; subir fotos y planes de viaje; personalizar perfil.
+   Permisos: Crear, editar y borrar sus propios viajes y valoraciones; subir fotos y planes de viaje;    personalizar perfil.
 
-Es dueño de: Sus propios viajes, valoraciones, planes de viaje y perfil de usuario.
+   Es dueño de: Sus propios viajes, valoraciones, planes de viaje y perfil de usuario.
 
 Administrador:
 
-Permisos: Gestión completa de usuarios, destinos, viajes y valoraciones; moderación de contenido.
+   Permisos: Gestión completa de usuarios, destinos, viajes y valoraciones; moderación de contenido.
 
-Es dueño de: Todos los viajes, valoraciones, destinos y usuarios.
+   Es dueño de: Todos los viajes, valoraciones, destinos y usuarios.
 
 Imágenes
 
-Usuario: Avatar o foto de perfil.
+   Usuario: Avatar o foto de perfil.
 
-Destino: Imagen representativa del destino.
+   Destino: Imagen representativa del destino.
 
 Viaje: Múltiples fotos asociadas al viaje.
 ---
