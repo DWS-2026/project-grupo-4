@@ -266,87 +266,70 @@ public class DestinationRestController {
 
 	// only logged users or admin can create places
 	@PostMapping("/{id}/places")
-	public ResponseEntity<PlaceDTO> createPlace(@PathVariable Long id, @RequestBody PlaceDTO placeDTO, Principal principal) {
-		if (principal == null) {
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+		public ResponseEntity<PlaceDTO> createPlace(@PathVariable Long id, @RequestBody PlaceDTO placeDTO, Principal principal) {
+			if (principal == null) {
+				return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+			}
+			Optional<Destination> destinationOpt = destinationService.findById(id);
+			if (destinationOpt.isEmpty()) {
+				return ResponseEntity.notFound().build();
+			}
+			if (!isValidPlace(placeDTO)) {
+				return ResponseEntity.badRequest().build();
+			}
+			Destination destination = destinationOpt.get();
+			Place place = new Place();
+			place.setName(placeDTO.name().trim());
+			place.setDescription(Jsoup.clean(placeDTO.description().trim(), Safelist.basic()));
+			try {
+				place.setCategory(Place.Category.valueOf(placeDTO.category().trim()));
+			} catch (IllegalArgumentException e) {
+				return ResponseEntity.badRequest().build();
+			}
+			place.setDestination(destination);
+			placeService.save(place);
+			PlaceDTO created = toPlaceDto(place);
+			return ResponseEntity.created(URI.create("/api/v1/destinations/" + id + "/places/" + place.getId()))
+					.body(created);
 		}
-
-		Optional<Destination> destinationOpt = destinationService.findById(id);
-		if (destinationOpt.isEmpty()) {
-			return ResponseEntity.notFound().build();
-		}
-
-		if (!isValidPlace(placeDTO)) {
-			return ResponseEntity.badRequest().build();
-		}
-
-		Destination destination = destinationOpt.get();
-
-		Place place = new Place();
-		place.setName(placeDTO.name().trim());
-		place.setDescription(placeDTO.description().trim());
-		
-		try {
-			place.setCategory(Place.Category.valueOf(placeDTO.category().trim()));
-		} catch (IllegalArgumentException e) {
-			return ResponseEntity.badRequest().build();
-		}
-
-		place.setDestination(destination);
-		placeService.save(place);
-
-		PlaceDTO created = toPlaceDto(place);
-		return ResponseEntity.created(URI.create("/api/v1/destinations/" + id + "/places/" + place.getId()))
-				.body(created);
-	}
 
 	// only admin can update the place
 	@PutMapping("/{id}/places/{placeId}")
-	public ResponseEntity<PlaceDTO> updatePlace(@PathVariable Long id, @PathVariable Long placeId, @RequestBody PlaceDTO placeDTO, Principal principal, Authentication authentication) {
-		
-		if (principal == null) {
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
-		}
-
-		boolean isAdmin = authentication != null && authentication.getAuthorities().stream()
-				.map(GrantedAuthority::getAuthority)
-				.anyMatch(auth -> "ROLE_ADMIN".equals(auth));
-		if (!isAdmin) {
-			return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
-		}
-
-		Optional<Destination> destinationOpt = destinationService.findById(id);
-		if (destinationOpt.isEmpty()) {
-			return ResponseEntity.notFound().build();
-		}
-
-		Optional<Place> placeOpt = placeService.findById(placeId);
-		if (placeOpt.isEmpty()) {
-			return ResponseEntity.notFound().build();
-		}
-
-		Place place = placeOpt.get();
-		// Verify that the place belongs to the destination
-		if (!place.getDestination().getId().equals(id)) {
-			return ResponseEntity.notFound().build();
-		}
-
-		if (!isValidPlace(placeDTO)) {
-			return ResponseEntity.badRequest().build();
-		}
-
-		place.setName(placeDTO.name().trim());
-		place.setDescription(placeDTO.description().trim());
-
-		try {
-			place.setCategory(Place.Category.valueOf(placeDTO.category().trim()));
-		} catch (IllegalArgumentException e) {
-			return ResponseEntity.badRequest().build();
-		}
-
-		placeService.save(place);
-		return ResponseEntity.ok(toPlaceDto(place));
-	}
+    public ResponseEntity<PlaceDTO> updatePlace(@PathVariable Long id, @PathVariable Long placeId, @RequestBody PlaceDTO placeDTO, Principal principal, Authentication authentication) {
+        if (principal == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+        boolean isAdmin = authentication != null && authentication.getAuthorities().stream()
+                .map(GrantedAuthority::getAuthority)
+                .anyMatch(auth -> "ROLE_ADMIN".equals(auth));
+        if (!isAdmin) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+        }
+        Optional<Destination> destinationOpt = destinationService.findById(id);
+        if (destinationOpt.isEmpty()) {
+            return ResponseEntity.notFound().build();
+        }
+        Optional<Place> placeOpt = placeService.findById(placeId);
+        if (placeOpt.isEmpty()) {
+            return ResponseEntity.notFound().build();
+        }
+        Place place = placeOpt.get();
+        if (!place.getDestination().getId().equals(id)) {
+            return ResponseEntity.notFound().build();
+        }
+        if (!isValidPlace(placeDTO)) {
+            return ResponseEntity.badRequest().build();
+        }
+        place.setName(placeDTO.name().trim());
+        place.setDescription(Jsoup.clean(placeDTO.description().trim(), Safelist.basic()));
+        try {
+            place.setCategory(Place.Category.valueOf(placeDTO.category().trim()));
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest().build();
+        }
+        placeService.save(place);
+        return ResponseEntity.ok(toPlaceDto(place));
+    }
 
 	// only admin can delete the place
 	@DeleteMapping("/{id}/places/{placeId}")

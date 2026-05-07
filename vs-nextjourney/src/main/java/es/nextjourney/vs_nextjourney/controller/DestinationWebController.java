@@ -204,17 +204,14 @@ public class DestinationWebController {
     @PostMapping("/destinations/{id}/add_place")
     public String savePlace(Model model, @PathVariable long id, @Valid Place place, BindingResult bindingResult) {
         Optional<Destination> destinationOpt = destinationService.findById(id);
-        
         if (destinationOpt.isPresent()) {
-            // Forzamos que sea un registro nuevo para evitar errores de persistencia
-            place.setId(null); 
+            place.setId(null);
             place.setDestination(destinationOpt.get());
-
+            place.setDescription(Jsoup.clean(place.getDescription(), Safelist.basic()));
             if (bindingResult.hasErrors()) {
                 return showErrorPlace(model, destinationOpt.get(), place, false, firstValidationError(bindingResult));
             }
-
-            placeService.save(place); 
+            placeService.save(place);
             return "redirect:/destinations/" + id;
         }
         return "redirect:/destinations";
@@ -244,32 +241,23 @@ public class DestinationWebController {
     @PostMapping("/destinations/{destId}/places/{placeId}/edit")
     public String editPlaceProcess(Model model, @PathVariable long destId, @PathVariable long placeId,
             @Valid Place place, BindingResult bindingResult, Authentication authentication) {
-        
         boolean isAdmin = authentication != null && authentication.getAuthorities().stream()
                 .anyMatch(auth -> "ROLE_ADMIN".equals(auth.getAuthority()));
-        
-        if (!isAdmin) {
-            return "error/403"; 
-        }
-
+        if (!isAdmin) return "error/403";
         Optional<Destination> destinationOpt = destinationService.findById(destId);
         Optional<Place> oldPlaceOpt = placeService.findById(placeId);
-
         if (destinationOpt.isPresent() && oldPlaceOpt.isPresent()) {
             place.setId(placeId);
             place.setDestination(destinationOpt.get());
-
+            place.setDescription(Jsoup.clean(place.getDescription(), Safelist.basic()));
             if (bindingResult.hasErrors()) {
                 return showErrorPlace(model, destinationOpt.get(), place, true, firstValidationError(bindingResult));
             }
-
             placeService.save(place);
             return "redirect:/destinations/" + destId;
         }
-
         return "redirect:/destinations";
     }
-            
 
     // Delete place of a destination
     @PostMapping("/destinations/{destId}/places/{placeId}/delete")
