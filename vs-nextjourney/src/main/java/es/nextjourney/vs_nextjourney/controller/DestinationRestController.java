@@ -34,6 +34,8 @@ import es.nextjourney.vs_nextjourney.model.Place;
 import es.nextjourney.vs_nextjourney.service.DestinationService;
 import es.nextjourney.vs_nextjourney.service.PlaceService;
 //import es.nextjourney.vs_nextjourney.service.ImageService;
+import org.jsoup.Jsoup;
+import org.jsoup.safety.Safelist;
 
 import static org.springframework.web.servlet.support.ServletUriComponentsBuilder.fromCurrentContextPath;
 
@@ -70,67 +72,67 @@ public class DestinationRestController {
 		return ResponseEntity.ok(toDto(destinationOpt.get()));
 	}
 
-	// only athenticated users and admin can create destinations
-	@PostMapping
-	public ResponseEntity<DestinationDTO> createDestination(@RequestBody DestinationDTO destinationDTO,
-			Principal principal, Authentication authentication) {
-		if (principal == null) {
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
-		}
-		if (!isValidDestination(destinationDTO)) {
-			return ResponseEntity.badRequest().build();
-		}
+// only athenticated users and admin can create destinations
+    @PostMapping
+    public ResponseEntity<DestinationDTO> createDestination(@RequestBody DestinationDTO destinationDTO,
+            Principal principal, Authentication authentication) {
+        if (principal == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+        if (!isValidDestination(destinationDTO)) {
+            return ResponseEntity.badRequest().build();
+        }
 
-		Destination destination = new Destination();
-		destination.setName(destinationDTO.name().trim());
-		destination.setCountry(destinationDTO.country().trim());
-		destination.setDescription(destinationDTO.description().trim());
-		destination.setOwnerName(principal.getName());
+        Destination destination = new Destination();
+        destination.setName(destinationDTO.name().trim());
+        destination.setCountry(destinationDTO.country().trim());
+        destination.setDescription(Jsoup.clean(destinationDTO.description().trim(), Safelist.basic()));
+        destination.setOwnerName(principal.getName());
 
-		// Destination requires a cover image. For API creation without image upload,
-		// use a placeholder image entity and let web flow replace it when needed.
-		Image coverImage = new Image();
-		coverImage.setContentType("application/octet-stream");
-		destination.setCoverImage(coverImage);
+        // Destination requires a cover image. For API creation without image upload,
+        // use a placeholder image entity and let web flow replace it when needed.
+        Image coverImage = new Image();
+        coverImage.setContentType("application/octet-stream");
+        destination.setCoverImage(coverImage);
 
-		destinationService.save(destination);
-		DestinationDTO created = toDto(destination);
-		return ResponseEntity.created(URI.create("/api/v1/destinations/" + destination.getId()))
-				.body(created);
-	}
+        destinationService.save(destination);
+        DestinationDTO created = toDto(destination);
+        return ResponseEntity.created(URI.create("/api/v1/destinations/" + destination.getId()))
+                .body(created);
+    }
 
-	// only admin can update destinations
-	@PutMapping("/{id}")
-	public ResponseEntity<DestinationDTO> updateDestination(@PathVariable Long id, @RequestBody DestinationDTO destinationDTO,
-			Principal principal, Authentication authentication) {
-		if (principal == null) {
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
-		}
+    // only admin can update destinations
+    @PutMapping("/{id}")
+    public ResponseEntity<DestinationDTO> updateDestination(@PathVariable Long id, @RequestBody DestinationDTO destinationDTO,
+            Principal principal, Authentication authentication) {
+        if (principal == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
 
-		boolean isAdmin = authentication != null && authentication.getAuthorities().stream()
-				.map(GrantedAuthority::getAuthority)
-				.anyMatch(auth -> "ROLE_ADMIN".equals(auth));
-		if (!isAdmin) {
-			return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
-		}
+        boolean isAdmin = authentication != null && authentication.getAuthorities().stream()
+                .map(GrantedAuthority::getAuthority)
+                .anyMatch(auth -> "ROLE_ADMIN".equals(auth));
+        if (!isAdmin) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+        }
 
-		if (!isValidDestination(destinationDTO)) {
-			return ResponseEntity.badRequest().build();
-		}
+        if (!isValidDestination(destinationDTO)) {
+            return ResponseEntity.badRequest().build();
+        }
 
-		Optional<Destination> existingOpt = destinationService.findById(id);
-		if (existingOpt.isEmpty()) {
-			return ResponseEntity.notFound().build();
-		}
+        Optional<Destination> existingOpt = destinationService.findById(id);
+        if (existingOpt.isEmpty()) {
+            return ResponseEntity.notFound().build();
+        }
 
-		Destination existing = existingOpt.get();
-		existing.setName(destinationDTO.name().trim());
-		existing.setCountry(destinationDTO.country().trim());
-		existing.setDescription(destinationDTO.description().trim());
+        Destination existing = existingOpt.get();
+        existing.setName(destinationDTO.name().trim());
+        existing.setCountry(destinationDTO.country().trim());
+        existing.setDescription(Jsoup.clean(destinationDTO.description().trim(), Safelist.basic()));
 
-		destinationService.save(existing);
-		return ResponseEntity.ok(toDto(existing));
-	}
+        destinationService.save(existing);
+        return ResponseEntity.ok(toDto(existing));
+    }
 
 	// only admin can delete destinations
 	@DeleteMapping("/{id}")

@@ -24,6 +24,9 @@ import es.nextjourney.vs_nextjourney.service.DestinationService;
 import es.nextjourney.vs_nextjourney.service.ImageService;
 import es.nextjourney.vs_nextjourney.service.PlaceService;
 
+import org.jsoup.Jsoup;
+import org.jsoup.safety.Safelist;
+
 @Controller
 public class DestinationWebController {
 
@@ -74,7 +77,7 @@ public class DestinationWebController {
             MultipartFile imageFile, Principal principal) throws IOException {
 
         if (bindingResult.hasErrors()) {
-            return showErrorDestination(model, destination, false, firstValidationError(bindingResult), false);
+            return showErrorDestination(model, destination, false, bindingResult.getAllErrors().get(0).getDefaultMessage(), false);
         }
 
         if (imageFile == null || imageFile.isEmpty()) {
@@ -82,14 +85,15 @@ public class DestinationWebController {
         }
 
         try {
+            destination.setDescription(Jsoup.clean(destination.getDescription(), Safelist.basic()));
+            
             destination.setOwnerName(principal.getName());
             Image image = imageService.createImage(imageFile);
             destination.setCoverImage(image);
             destinationService.save(destination);
             return "redirect:/destinations";
         } catch (Exception e) {
-            return showErrorDestination(model, destination, false,
-                    "No se ha podido guardar el destino. Revisa los datos e intentalo de nuevo.", false);
+            return showErrorDestination(model, destination, false, "No se ha podido guardar el destino. Revisa los datos.", false);
         }
     }
 
@@ -119,48 +123,48 @@ public class DestinationWebController {
 
     // Edit destination - POST
     @PostMapping("/destinations/{id}/edit")
-    public String editDestinationProcess(Model model, @Valid Destination destination, BindingResult bindingResult,
-            MultipartFile imageFile, @PathVariable long id, Principal principal, Authentication authentication) throws IOException {
-        Optional<Destination> oldDestOpt = destinationService.findById(id);
-        
-        if (oldDestOpt.isPresent()) {
-            Destination oldDest = oldDestOpt.get();
+        public String editDestinationProcess(Model model, @Valid Destination destination, BindingResult bindingResult,
+                MultipartFile imageFile, @PathVariable long id, Principal principal, Authentication authentication) throws IOException {
+            Optional<Destination> oldDestOpt = destinationService.findById(id);
+            
+            if (oldDestOpt.isPresent()) {
+                Destination oldDest = oldDestOpt.get();
 
-            
-            boolean isAdmin = authentication != null && authentication.getAuthorities().stream()
-                    .anyMatch(auth -> "ROLE_ADMIN".equals(auth.getAuthority()));
-            
-            if (!isAdmin && (oldDest.getOwnerName() == null || !oldDest.getOwnerName().equals(principal.getName()))) {
-                return "error/403"; 
-            }
-            
+                boolean isAdmin = authentication != null && authentication.getAuthorities().stream()
+                        .anyMatch(auth -> "ROLE_ADMIN".equals(auth.getAuthority()));
+                
+                if (!isAdmin && (oldDest.getOwnerName() == null || !oldDest.getOwnerName().equals(principal.getName()))) {
+                    return "error/403"; 
+                }
 
-            if (bindingResult.hasErrors()) {
+                if (bindingResult.hasErrors()) {
+                    destination.setId(id);
+                    destination.setCoverImage(oldDest.getCoverImage());
+                    destination.setPlaces(oldDest.getPlaces());
+                    destination.setReviews(oldDest.getReviews());
+                    return showErrorDestination(model, destination, true, firstValidationError(bindingResult), false);
+                }
+                
+                destination.setDescription(org.jsoup.Jsoup.clean(destination.getDescription(), org.jsoup.safety.Safelist.basic()));
+
                 destination.setId(id);
-                destination.setCoverImage(oldDest.getCoverImage());
                 destination.setPlaces(oldDest.getPlaces());
                 destination.setReviews(oldDest.getReviews());
-                return showErrorDestination(model, destination, true, firstValidationError(bindingResult), false);
+                destination.setOwnerName(oldDest.getOwnerName());
+
+                if (imageFile == null || imageFile.isEmpty()) {
+                    destination.setCoverImage(oldDest.getCoverImage());
+                } else {
+                    Image image = imageService.createImage(imageFile);
+                    destination.setCoverImage(image);
+                }
+
+                destinationService.save(destination);
+                return "redirect:/destinations";
             }
             
-            destination.setId(id);
-            destination.setPlaces(oldDest.getPlaces());
-            destination.setReviews(oldDest.getReviews());
-            destination.setOwnerName(oldDest.getOwnerName());
-
-            if (imageFile == null || imageFile.isEmpty()) {
-                destination.setCoverImage(oldDest.getCoverImage());
-            } else {
-                Image image = imageService.createImage(imageFile);
-                destination.setCoverImage(image);
-            }
-
-            destinationService.save(destination);
             return "redirect:/destinations";
         }
-        
-        return "redirect:/destinations";
-    }
 
     // Auxiliar method for not repeating error code
     private String showErrorDestination(Model model, Destination destination, boolean isEditing, String errorMessage,
