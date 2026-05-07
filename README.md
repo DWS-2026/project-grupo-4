@@ -437,15 +437,14 @@ Me he encargado de implementar la capa de seguridad principal de la aplicación,
 
 #### **Alumno 2 - [Nombre Completo]**
 
-[Descripción de las tareas y responsabilidades principales del alumno en el proyecto]
-
+Creación y securización de todo aquello relacionado con las reviews, asi como ayudar a ciertos endpoints de la api y diversos rest conroler
 | Nº    | Commits      | Files      |
 |:------------: |:------------:| :------------:|
-|1| [Descripción commit 1](URL_commit_1)  | [Archivo1](URL_archivo_1)   |
-|2| [Descripción commit 2](URL_commit_2)  | [Archivo2](URL_archivo_2)   |
-|3| [Descripción commit 3](URL_commit_3)  | [Archivo3](URL_archivo_3)   |
-|4| [Descripción commit 4](URL_commit_4)  | [Archivo4](URL_archivo_4)   |
-|5| [Descripción commit 5](URL_commit_5)  | [Archivo5](URL_archivo_5)   |
+|1| [DtabaseInitializaer](https://github.com/DWS-2026/dws-2026-project-base/commit/8f34d1acee53a20a0353a7b37a17e454fac594bb)  | [DatabaseInitializer.java](vs-nextjourney/src/main/java/es/nextjourney/vs_nextjourney/controller/DatabaseInitializer.java)   |
+|2| [api](https://github.com/DWS-2026/dws-2026-project-base/commit/64af71620ab224b4cac92a0266f0723e5bc4c203)  | [api-docs.html](api-docs/api-docs.html)   |
+|3| [ReviewRestController]([URL_commit_3](https://github.com/DWS-2026/dws-2026-project-base/commit/18f25ed57b7fb867677c271ec2eff0b8a5dd21f9))  | [ReviewRestController.java](vs-nextjourney/src/main/java/es/nextjourney/vs_nextjourney/controller/ReviewRestController.java)   |
+|4| [CreateRestController](https://github.com/DWS-2026/dws-2026-project-base/commit/6d0768be779f370dd63fb415282375ca1eab4c8e)  | [DestinationRestController.java](vs-nextjourney/src/main/java/es/nextjourney/vs_nextjourney/controller/DestinationRestController.java)   |
+|5| [PlaceImplementationOfDestinationRestController](https://github.com/DWS-2026/dws-2026-project-base/commit/2fccd5f531c8154f9ac460055f3e9e54f00b9caa)  | [DestinationRestCOntroller.java](vs-nextjourney/src/main/java/es/nextjourney/vs_nextjourney/controller/DestinationRestController.java)   |
 
 ---
 
