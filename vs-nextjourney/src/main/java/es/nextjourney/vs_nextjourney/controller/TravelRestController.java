@@ -31,9 +31,11 @@ import java.util.Optional;
 import javax.imageio.ImageIO;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
+import io.swagger.v3.oas.annotations.tags.Tag;
 
 @RestController
 @RequestMapping("/api/v1/travels")
+@Tag(name = "Viajes", description = "Gestión de viajes, itinerarios e imágenes asociadas.")
 public class TravelRestController {
 
     @Autowired

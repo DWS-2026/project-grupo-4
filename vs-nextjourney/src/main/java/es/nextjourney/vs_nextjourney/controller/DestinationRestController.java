@@ -27,6 +27,7 @@ import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.server.ResponseStatusException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import io.swagger.v3.oas.annotations.tags.Tag;
 
 import es.nextjourney.vs_nextjourney.dto.DestinationDTO;
 import es.nextjourney.vs_nextjourney.dto.PlaceDTO;
@@ -44,6 +45,7 @@ import static org.springframework.web.servlet.support.ServletUriComponentsBuilde
 
 @RestController
 @RequestMapping("/api/v1/destinations")
+@Tag(name = "Destinos", description = "Consulta y administración de destinos y lugares asociados.")
 public class DestinationRestController {
 
 	@Autowired

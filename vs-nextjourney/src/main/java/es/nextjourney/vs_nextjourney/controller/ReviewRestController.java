@@ -28,6 +28,7 @@ import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.server.ResponseStatusException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import io.swagger.v3.oas.annotations.tags.Tag;
 
 import es.nextjourney.vs_nextjourney.dto.ReviewDTO;
 import es.nextjourney.vs_nextjourney.model.Image;
@@ -45,6 +46,7 @@ import static org.springframework.web.servlet.support.ServletUriComponentsBuilde
 
 @RestController
 @RequestMapping("/api/v1/reviews")
+@Tag(name = "Reseñas", description = "Listado, creación y gestión de reseñas sobre lugares.")
 public class ReviewRestController {
 
 	private static final int MAX_REVIEW_LENGTH = 3000;
