@@ -9,7 +9,6 @@ import org.springframework.web.multipart.MultipartFile;
 import es.nextjourney.vs_nextjourney.dto.UserDTO;
 import es.nextjourney.vs_nextjourney.dto.UserMapper;
 import es.nextjourney.vs_nextjourney.model.Image;
-import es.nextjourney.vs_nextjourney.service.ImageService;
 import es.nextjourney.vs_nextjourney.model.User;
 import es.nextjourney.vs_nextjourney.model.Travel;
 import es.nextjourney.vs_nextjourney.service.UserService;
@@ -21,7 +20,6 @@ import java.util.regex.Pattern;
 import java.sql.SQLException;
 import javax.sql.rowset.serial.SerialBlob;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -231,7 +229,7 @@ public class UserRestController {
         } catch (Exception e) {
             e.printStackTrace();
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body("Error al eliminar el usuario: " + e.getMessage());
+                    .body("Ha ocurrido un error al intentar eliminar el usuario");
         }
     }
     @DeleteMapping(value = { "/profile/image", "/profile/{id}/image" })

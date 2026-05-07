@@ -162,13 +162,13 @@ public class LoginWebController {
 
         if (!user2.getUsername().equals(requestedUsername) && userService.usernameExists(requestedUsername)) {
             model.addAttribute("user", user2);
-            model.addAttribute("error", "Ese nombre de usuario ya existe");
+            model.addAttribute("error", "Utiliza otro nombre de usuario");
             return "edit_profile";
         }
 
         if (!user2.getEmail().equals(requestedEmail) && userService.emailExists(requestedEmail)) {
             model.addAttribute("user", user2);
-            model.addAttribute("error", "Ese correo electrónico ya está en uso");
+            model.addAttribute("error", "Utiliza otro correo electronico");
             return "edit_profile";
         }
 

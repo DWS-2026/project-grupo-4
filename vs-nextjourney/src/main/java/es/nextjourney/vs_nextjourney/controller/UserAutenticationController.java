@@ -10,10 +10,12 @@ import es.nextjourney.vs_nextjourney.security.jwt.AuthResponse;
 import es.nextjourney.vs_nextjourney.security.jwt.UserLoginService;
 import es.nextjourney.vs_nextjourney.security.jwt.JwtTokenProvider;
 import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.sql.SQLException;
 import java.util.List;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.regex.Pattern;
 import javax.sql.rowset.serial.SerialBlob;
 import org.springframework.http.HttpStatus;
@@ -33,11 +35,15 @@ import org.springframework.web.multipart.MultipartFile;
 public class UserAutenticationController {
 
     private static final Pattern PASSWORD_POLICY = Pattern.compile(
-        "^(?=.*[A-Za-z])(?=.*\\d)(?=.*[@$!%*#?&]).+$"
-    );
+            "^(?=.*[A-Za-z])(?=.*\\d)(?=.*[@$!%*#?&]).+$");
     private static final Pattern SAFE_INPUT_PATTERN = Pattern.compile(
-        "^[a-zA-Z0-9._@-]{3,50}$"
-    );
+            "^[a-zA-Z0-9._@-]{3,50}$");
+
+    // Rate limit
+    private static final int MAX_ATTEMPTS = 5;
+    private static final long BLOCK_DURATION_MS = 15 * 60 * 1000;
+    private final ConcurrentHashMap<String, Integer> failedAttempts = new ConcurrentHashMap<>();
+    private final ConcurrentHashMap<String, Long> blockedUsers = new ConcurrentHashMap<>();
 
     private final AuthenticationManager authenticationManager;
     private final UserDetailsService userDetailsService;
@@ -48,12 +54,12 @@ public class UserAutenticationController {
     private final UserMapper userMapper;
 
     public UserAutenticationController(AuthenticationManager authenticationManager,
-                              UserDetailsService userDetailsService,
-                              JwtTokenProvider jwtTokenProvider,
-                              UserLoginService userLoginService,
-                              UserService userService,
-                              PasswordEncoder passwordEncoder,
-                              UserMapper userMapper) {
+            UserDetailsService userDetailsService,
+            JwtTokenProvider jwtTokenProvider,
+            UserLoginService userLoginService,
+            UserService userService,
+            PasswordEncoder passwordEncoder,
+            UserMapper userMapper) {
         this.authenticationManager = authenticationManager;
         this.userDetailsService = userDetailsService;
         this.jwtTokenProvider = jwtTokenProvider;
@@ -63,21 +69,24 @@ public class UserAutenticationController {
         this.userMapper = userMapper;
     }
 
-    // anyone can acces the login endpoint
     @PostMapping("/login")
     public ResponseEntity<AuthResponse> login(
             @ModelAttribute UserDTO user,
+            HttpServletRequest request,
             HttpServletResponse response) {
 
-        if (!isSafeInput(user.username())) {
-            return ResponseEntity.badRequest()
-                .body(new AuthResponse(AuthResponse.Status.FAILURE, "Username inválido"));
+        String identifier = user.username();
+         if (isUserBlocked(identifier)) {
+            return ResponseEntity.status(HttpStatus.TOO_MANY_REQUESTS).body(new AuthResponse(AuthResponse.Status.FAILURE, "Demasiados intentos."));
+        }
+
+        if (!isSafeInput(identifier)) {
+            registerLoginFailure(identifier);
+            return ResponseEntity.badRequest().body(new AuthResponse(AuthResponse.Status.FAILURE,"Credenciales incorrectas"));
         }
 
         try {
-            Authentication authentication = authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(user.username(), user.password())
-            );
+            Authentication authentication = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(user.username(), user.password()));
             SecurityContextHolder.getContext().setAuthentication(authentication);
 
             UserDetails userDetails = userDetailsService.loadUserByUsername(user.username());
@@ -87,13 +96,17 @@ public class UserAutenticationController {
 
             response.addCookie(buildTokenCookie(TokenType.ACCESS, accessToken));
             response.addCookie(buildTokenCookie(TokenType.REFRESH, refreshToken));
+            // Reset login failures on successful login
+            resetLoginFailures(identifier);
 
-            return ResponseEntity.ok(new AuthResponse(AuthResponse.Status.SUCCESS,
-                "Login exitoso. Tokens creados en cookie."));
+            return ResponseEntity.ok(new AuthResponse(AuthResponse.Status.SUCCESS,"Login exitoso"));
 
         } catch (Exception e) {
+            // Register login fail and add cunt
+            registerLoginFailure(identifier);
+
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-                .body(new AuthResponse(AuthResponse.Status.FAILURE, "Credenciales incorrectas", e.getMessage()));
+                    .body(new AuthResponse(AuthResponse.Status.FAILURE, "Credenciales incorrectas"));
         }
     }
 
@@ -106,28 +119,28 @@ public class UserAutenticationController {
 
         if (!isSafeInput(user.username())) {
             return ResponseEntity.badRequest()
-                .body(new AuthResponse(AuthResponse.Status.FAILURE, "Username inválido"));
+                    .body(new AuthResponse(AuthResponse.Status.FAILURE, "Username inválido"));
         }
 
         if (!isSafeInput(user.email())) {
             return ResponseEntity.badRequest()
-                .body(new AuthResponse(AuthResponse.Status.FAILURE, "Email inválido"));
+                    .body(new AuthResponse(AuthResponse.Status.FAILURE, "Email inválido"));
         }
 
         if (!isPasswordPolicyValid(user.password())) {
             return ResponseEntity.badRequest()
-                .body(new AuthResponse(AuthResponse.Status.FAILURE,
-                    "La contraseña debe contener letras, números y un carácter especial"));
+                    .body(new AuthResponse(AuthResponse.Status.FAILURE,
+                            "La contraseña debe contener letras, números y un carácter especial"));
         }
 
         if (userService.usernameExists(user.username())) {
             return ResponseEntity.status(HttpStatus.CONFLICT)
-                .body(new AuthResponse(AuthResponse.Status.FAILURE, "Username ya existe"));
+                    .body(new AuthResponse(AuthResponse.Status.FAILURE, "Utiliza otro nombre de usuario"));
         }
 
         if (userService.emailExists(user.email())) {
             return ResponseEntity.status(HttpStatus.CONFLICT)
-                .body(new AuthResponse(AuthResponse.Status.FAILURE, "Email ya existe"));
+                    .body(new AuthResponse(AuthResponse.Status.FAILURE, "Utiliza otro correo electronico"));
         }
         User user2 = userMapper.toDomain(user);
 
@@ -144,7 +157,7 @@ public class UserAutenticationController {
         userService.saveUser(user2);
 
         return ResponseEntity.status(HttpStatus.CREATED)
-            .body(new AuthResponse(AuthResponse.Status.SUCCESS, "Registro exitoso"));
+                .body(new AuthResponse(AuthResponse.Status.SUCCESS, "Registro exitoso"));
     }
 
     @PostMapping("/refresh")
@@ -163,6 +176,7 @@ public class UserAutenticationController {
         Cookie cookie = new Cookie(type.cookieName, token);
         cookie.setMaxAge((int) type.duration.getSeconds());
         cookie.setHttpOnly(true);
+        cookie.setSecure(true);
         cookie.setPath("/");
         return cookie;
     }
@@ -170,8 +184,38 @@ public class UserAutenticationController {
     private boolean isPasswordPolicyValid(String password) {
         return password != null && PASSWORD_POLICY.matcher(password).matches();
     }
-
     private boolean isSafeInput(String input) {
         return input != null && SAFE_INPUT_PATTERN.matcher(input).matches();
     }
+
+    // Rate limit
+
+    private void registerLoginFailure(String user) {
+    if (failedAttempts.size() > 100) {
+        failedAttempts.clear();
+    }
+    int attempts = failedAttempts.getOrDefault(user, 0) + 1;
+    failedAttempts.put(user, attempts);
+    
+    if (attempts >= MAX_ATTEMPTS) {
+        blockedUsers.put(user, System.currentTimeMillis() + BLOCK_DURATION_MS);
+        failedAttempts.remove(user);
+    }
+}
+
+    private void resetLoginFailures(String user) {
+        failedAttempts.remove(user);
+        blockedUsers.remove(user);
+    }
+    private boolean isUserBlocked(String user) {
+        Long expiry = blockedUsers.get(user);
+        if (expiry == null) return false;
+        if (System.currentTimeMillis() > expiry) {
+            blockedUsers.remove(user);
+            return false;
+        }
+        return true;
+    }
+
+
 }
