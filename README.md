@@ -448,17 +448,22 @@ Creación y securización de todo aquello relacionado con las reviews, asi como 
 
 ---
 
-#### **Alumno 3 - [Nombre Completo]**
+#### **Alumno 3 - [Nerea Sanz Sobrados]**
 
-[Descripción de las tareas y responsabilidades principales del alumno en el proyecto]
+He dasarroyado y securizado principalmente el UserRestController, el UserAuthenticationController, el UserDTO, el UserMapper, el texto en riquecido y la validación de subida de imágenes. Además, también he colaborado con otras partes de la práctica.
 
 | Nº    | Commits      | Files      |
 |:------------: |:------------:| :------------:|
-|1| [Descripción commit 1](URL_commit_1)  | [Archivo1](URL_archivo_1)   |
-|2| [Descripción commit 2](URL_commit_2)  | [Archivo2](URL_archivo_2)   |
-|3| [Descripción commit 3](URL_commit_3)  | [Archivo3](URL_archivo_3)   |
-|4| [Descripción commit 4](URL_commit_4)  | [Archivo4](URL_archivo_4)   |
-|5| [Descripción commit 5](URL_commit_5)  | [Archivo5](URL_archivo_5)   |
+|1| [Create UserAuthentication and userRest controllers](https://github.com/DWS-2026/project-grupo-4/commit/960a5fcf36eb7fbc99a416fe720e7feabc8ad213)  | [UserAthenticationController.java](https://github.com/DWS-2026/project-grupo-4/blob/main/vs-nextjourney/src/main/java/es/nextjourney/vs_nextjourney/controller/UserAutenticationController.java), [UserRestController.java](https://github.com/DWS-2026/project-grupo-4/blob/main/vs-nextjourney/src/main/java/es/nextjourney/vs_nextjourney/controller/UserRestController.java), [UserMapper.java](https://github.com/DWS-2026/project-grupo-4/blob/main/vs-nextjourney/src/main/java/es/nextjourney/vs_nextjourney/dto/UserMapper.java)   |
+|2| [Modify user rest controllers](https://github.com/DWS-2026/project-grupo-4/commit/ce3c77b13a4ee2244a5132246af1b1201acb4ff6)  | [UserDTO.java](https://github.com/DWS-2026/project-grupo-4/blob/main/vs-nextjourney/src/main/java/es/nextjourney/vs_nextjourney/dto/UserDTO.java),[UserAthenticationController.java](https://github.com/DWS-2026/project-grupo-4/blob/main/vs-nextjourney/src/main/java/es/nextjourney/vs_nextjourney/controller/UserAutenticationController.java), [UserRestController.java](https://github.com/DWS-2026/project-grupo-4/blob/main/vs-nextjourney/src/main/java/es/nextjourney/vs_nextjourney/controller/UserRestController.java), [UserMapper.java](https://github.com/DWS-2026/project-grupo-4/blob/main/vs-nextjourney/src/main/java/es/nextjourney/vs_nextjourney/dto/UserMapper.java), [SecurityClass.java](https://github.com/DWS-2026/project-grupo-4/commit/ce3c77b13a4ee2244a5132246af1b1201acb4ff6#diff-c3fb6a9b6a85cef4b1ba81ec78d7055fecb7e5e5370a01c47fb852d85b7d4648)  |
+|3| [Rich text](https://github.com/DWS-2026/project-grupo-4/commit/1a2e8e63c5a525ad2243b19131f1405d543753d9)  | [create_new_travel.html](https://github.com/DWS-2026/project-grupo-4/blob/main/vs-nextjourney/src/main/resources/templates/create_new_travel.html), [edit_travel.html](https://github.com/DWS-2026/project-grupo-4/blob/main/vs-nextjourney/src/main/resources/templates/edit_travel.html), [mytravels.html](https://github.com/DWS-2026/project-grupo-4/blob/main/vs-nextjourney/src/main/resources/templates/mytravels.html), [one_travel.html](https://github.com/DWS-2026/project-grupo-4/blob/main/vs-nextjourney/src/main/resources/templates/one_travel.html)
+|
+|4| [Modify imagesFiles](https://github.com/DWS-2026/project-grupo-4/commit/b0fef418f3aba26bda69cea15bca6186190a557e)  |  [UserRestController.java](https://github.com/DWS-2026/project-grupo-4/blob/main/vs-nextjourney/src/main/java/es/nextjourney/vs_nextjourney/controller/UserRestController.java),[DestinationRestController.java](https://github.com/DWS-2026/project-grupo-4/blob/main/vs-nextjourney/src/main/java/es/nextjourney/vs_nextjourney/controller/DestinationRestController.java)
+, [DestinationWebController.java](https://github.com/DWS-2026/project-grupo-4/blob/main/vs-nextjourney/src/main/java/es/nextjourney/vs_nextjourney/controller/DestinationWebController.java), [LoginWebController.java](https://github.com/DWS-2026/project-grupo-4/blob/main/vs-nextjourney/src/main/java/es/nextjourney/vs_nextjourney/controller/LoginWebController.java), [ReviewRestController.java](https://github.com/DWS-2026/project-grupo-4/blob/main/vs-nextjourney/src/main/java/es/nextjourney/vs_nextjourney/controller/ReviewRestController.java),
+[ReviewWebController.java](https://github.com/DWS-2026/project-grupo-4/blob/main/vs-nextjourney/src/main/java/es/nextjourney/vs_nextjourney/controller/ReviewWebController.java),
+[TravelRestController.java](https://github.com/DWS-2026/project-grupo-4/blob/main/vs-nextjourney/src/main/java/es/nextjourney/vs_nextjourney/controller/TravelRestController.java)   |
+
+|5| [Rich text](https://github.com/DWS-2026/project-grupo-4/commit/120e4c165f586d1fc76b90a37cc1106a7b4638ac)  | [add-review.html](https://github.com/DWS-2026/project-grupo-4/blob/main/vs-nextjourney/src/main/resources/templates/add-review.html), [add_destination.html](https://github.com/DWS-2026/project-grupo-4/blob/main/vs-nextjourney/src/main/resources/templates/add_destination.html), [add_place.html](https://github.com/DWS-2026/project-grupo-4/blob/main/vs-nextjourney/src/main/resources/templates/add_place.html), [destinations.html](https://github.com/DWS-2026/project-grupo-4/blob/main/vs-nextjourney/src/main/resources/templates/destinations.html), [header.html](https://github.com/DWS-2026/project-grupo-4/blob/main/vs-nextjourney/src/main/resources/templates/header.html), [my_reviews.html](https://github.com/DWS-2026/project-grupo-4/blob/main/vs-nextjourney/src/main/resources/templates/my_reviews.html), [one_destination.html](https://github.com/DWS-2026/project-grupo-4/blob/main/vs-nextjourney/src/main/resources/templates/one_destination.html), [place_reviews.html](https://github.com/DWS-2026/project-grupo-4/blob/main/vs-nextjourney/src/main/resources/templates/place_reviews.html)  |
 
 ---
 
