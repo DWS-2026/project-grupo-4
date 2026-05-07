@@ -39,6 +39,14 @@ public class ImageRestController {
 	@Autowired
 	private ImageMapper imageMapper;
 
+
+    @GetMapping({"", "/"})
+    public ResponseEntity<Page<ImageDTO>> getAllImages(Pageable pageable) {
+        Page<ImageDTO> images = imageService.findAll(pageable)
+                .map(imageMapper::toDTO);
+        return ResponseEntity.ok(images);
+    }
+
 	@GetMapping("/{id}")
 	public ImageDTO getImage(@PathVariable long id) {
 		return imageMapper.toDTO(imageService.getImageById(id));

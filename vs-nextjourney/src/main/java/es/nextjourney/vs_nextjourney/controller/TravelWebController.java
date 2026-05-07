@@ -9,8 +9,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-import javax.imageio.ImageIO;
-import java.awt.image.BufferedImage;
+import java.nio.file.Files;
 import java.nio.file.Path;
 
 import jakarta.servlet.http.HttpServletResponse;
@@ -19,7 +18,7 @@ import jakarta.validation.Valid;
 import org.jsoup.Jsoup;
 import org.jsoup.safety.Safelist;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -29,7 +28,6 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.multipart.MultipartFile;
-import org.springframework.web.server.ResponseStatusException;
 
 import es.nextjourney.vs_nextjourney.model.Image;
 import es.nextjourney.vs_nextjourney.model.Travel;
@@ -575,28 +573,16 @@ public class TravelWebController {
     }
 
     private void validateImage(MultipartFile file) {
-        if (file == null || file.isEmpty())
-            return;
+        if (file == null || file.isEmpty()) return;
         String contentType = file.getContentType();
         if (contentType == null || !contentType.startsWith("image/")) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "El archivo " + file.getOriginalFilename() + " no es una imagen válida.");
+            throw new RuntimeException("El archivo " + file.getOriginalFilename() + " no es una imagen válida.");
         }
         String name = file.getOriginalFilename().toLowerCase();
         if (!(name.endsWith(".jpg") || name.endsWith(".jpeg") || name.endsWith(".png"))) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Solo se admiten imágenes JPG o PNG.");
-        }
-        try {
-            BufferedImage image = ImageIO.read(file.getInputStream());
-
-            if (image == null) {
-                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "El archivo no es una imagen válida.");
-            }
-        } catch (IOException e) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Error al procesar la imagen.");
+            throw new RuntimeException("Solo se admiten imágenes JPG o PNG.");
         }
     }
-
-    
 
     /* 
     private void sanitizeTravelData(Travel travel) {

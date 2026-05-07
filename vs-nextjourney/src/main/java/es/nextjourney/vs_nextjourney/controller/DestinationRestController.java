@@ -233,16 +233,15 @@ public class DestinationRestController {
 
 	// anyone can see the destinations, so no authentication required for this endpoint
 	@GetMapping("/{id}/places")
-	public ResponseEntity<List<PlaceDTO>> getPlacesByDestination(@PathVariable Long id) {
+	public ResponseEntity<Page<PlaceDTO>> getPlacesByDestination(@PathVariable Long id, Pageable pageable) {
 		Optional<Destination> destinationOpt = destinationService.findById(id);
 		if (destinationOpt.isEmpty()) {
 			return ResponseEntity.notFound().build();
 		}
-
-		List<PlaceDTO> places = destinationOpt.get().getPlaces().stream()
-				.map(this::toPlaceDto)
-				.toList();
-
+		
+		// Necesitas tener este método en tu PlaceService / PlaceRepository
+		Page<PlaceDTO> places = placeService.findByDestinationId(id, pageable)
+											.map(this::toPlaceDto);
 		return ResponseEntity.ok(places);
 	}
 

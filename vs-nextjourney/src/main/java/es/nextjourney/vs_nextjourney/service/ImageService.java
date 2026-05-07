@@ -14,6 +14,8 @@ import org.springframework.web.multipart.MultipartFile;
 
 import es.nextjourney.vs_nextjourney.repository.ImageRepository;
 import es.nextjourney.vs_nextjourney.model.Image;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 @Service
 public class ImageService {
@@ -73,5 +75,9 @@ public class ImageService {
         if (imageRepository.existsById(id)) {
             imageRepository.deleteById(id);
         }
+    }
+
+    public Page<Image> findAll(Pageable pageable) {
+        return imageRepository.findAll(pageable);
     }
 }
