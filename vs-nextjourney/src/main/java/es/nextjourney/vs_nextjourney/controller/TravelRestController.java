@@ -11,6 +11,8 @@ import es.nextjourney.vs_nextjourney.service.FileStorageService;
 import es.nextjourney.vs_nextjourney.service.ImageService;
 import es.nextjourney.vs_nextjourney.service.TravelService;
 
+import org.jsoup.Jsoup;
+import org.jsoup.safety.Safelist;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -121,6 +123,8 @@ public class TravelRestController {
 
         Travel travel = travelMapper.toDomain(travelDTO);
 
+        sanitizeTravelData(travel);
+
         if (!(isAdmin && travel.getOwnerName() != null)) {
             travel.setOwnerName(principal.getName());
         }
@@ -163,6 +167,8 @@ public class TravelRestController {
         if (!isAdmin && !existingTravel.getOwnerName().equals(principal.getName())) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
         }
+
+        sanitizeTravelData(existingTravel);
 
         // new informartion to update the travel
         // TODO: REVISAR
@@ -498,4 +504,21 @@ public class TravelRestController {
         return travel.getUserTravels() != null && travel.getUserTravels().stream()
                 .anyMatch(user -> username.equals(user.getUsername()));
     }
+
+    private void sanitizeTravelData(Travel travel) {
+    // XSS protection
+    
+    if (travel.getTitle() != null) {
+        // the title can't contain any html tag 
+        travel.setTitle(Jsoup.clean(travel.getTitle(), Safelist.none()));
+    }
+    
+    if (travel.getDescription() != null) {
+        travel.setDescription(Jsoup.clean(travel.getDescription(), Safelist.basic()));
+    }
+    
+    if (travel.getComment() != null) {
+        travel.setComment(Jsoup.clean(travel.getComment(), Safelist.basic()));
+    }
+}
 }

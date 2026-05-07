@@ -91,9 +91,13 @@ public class TravelWebController {
             validateImage(coverImage); // validates the cover is an image
             for (MultipartFile f : carouselImages) validateImage(f); // validates the carousel images
 
-            // cleans the HTML of description and comment (XSS)
-            travel.setDescription(Jsoup.clean(travel.getDescription(), Safelist.basic()));
-            travel.setComment(Jsoup.clean(travel.getComment(), Safelist.basic()));
+            // XSS protection
+            if (travel.getDescription() != null) {
+                travel.setDescription(Jsoup.clean(travel.getDescription(), Safelist.basic()));
+            }
+            if (travel.getComment() != null) {
+                travel.setComment(Jsoup.clean(travel.getComment(), Safelist.basic()));
+            }
         } catch (RuntimeException e) {
             model.addAttribute("error", e.getMessage());
             return "create_new_travel";
@@ -461,6 +465,11 @@ public class TravelWebController {
                 travel.getUserTravels().stream().anyMatch(u -> u.getUsername().equals(principal.getName())));
 
         if (!hasAccess) {
+            response.sendError(HttpServletResponse.SC_FORBIDDEN);
+            return;
+        }
+
+        if (!isAuthorizedForTravel(travel, principal.getName())) {
             response.sendError(HttpServletResponse.SC_FORBIDDEN);
             return;
         }
