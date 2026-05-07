@@ -61,8 +61,7 @@ public class UserRestController {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
 
         User currentUser = userService.findByUserName(principal.getName());
-
-        // Verificación de seguridad: Solo ADMIN
+        
         if (!currentUser.isAdminUser()) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN)
                     .body("No tienes permisos de administrador");
