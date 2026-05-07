@@ -9,6 +9,9 @@ import org.springframework.stereotype.Service;
 import es.nextjourney.vs_nextjourney.model.Place;
 import es.nextjourney.vs_nextjourney.repository.PlaceRepository;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+
 @Service
 public class PlaceService {
 
@@ -38,4 +41,13 @@ public class PlaceService {
     public void delete(long id) {
         repository.deleteById(id);
     }
+
+    public Page<Place> findAll(Pageable pageable) {
+        return repository.findAll(pageable);
+    }
+
+    public Page<Place> findByDestinationId(Long destinationId, Pageable pageable) {
+        return repository.findByDestinationId(destinationId, pageable);
+    }
+
 }
