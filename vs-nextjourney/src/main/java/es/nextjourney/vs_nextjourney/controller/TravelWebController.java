@@ -8,13 +8,9 @@ import java.security.Principal;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-
-import java.nio.file.Files;
 import java.nio.file.Path;
-
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
-
 import org.jsoup.Jsoup;
 import org.jsoup.safety.Safelist;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,7 +24,6 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.multipart.MultipartFile;
-
 import es.nextjourney.vs_nextjourney.model.Image;
 import es.nextjourney.vs_nextjourney.model.Travel;
 import es.nextjourney.vs_nextjourney.model.User;
@@ -39,6 +34,7 @@ import es.nextjourney.vs_nextjourney.service.TravelService;
 
 @Controller
 public class TravelWebController {
+
     @Autowired
     private TravelService travelService;
 
@@ -74,38 +70,25 @@ public class TravelWebController {
 
     // Create travel - POST
     @PostMapping("/travel/new")
-    public String newTravelPost(@Valid @ModelAttribute("travel") Travel travel, BindingResult bindingResult,
-            @RequestParam("coverImageFile") MultipartFile coverImage,
-            @RequestParam("carouselImageFiles") MultipartFile[] carouselImages,
-            @RequestParam("itineraryFile") MultipartFile itinerary,
-            Principal principal,
-            Model model) throws IOException {
-        
+    public String newTravelPost(@Valid @ModelAttribute("travel") Travel travel, BindingResult bindingResult, @RequestParam("coverImageFile") MultipartFile coverImage, @RequestParam("carouselImageFiles") MultipartFile[] carouselImages, @RequestParam("itineraryFile") MultipartFile itinerary, Principal principal, Model model) throws IOException {
         // verify the user is logged
         if (principal == null) {
             return "redirect:/sign_in";
         }
-        
         // security validations
         try {
             validateImage(coverImage); // validates the cover is an image
             for (MultipartFile f : carouselImages) validateImage(f); // validates the carousel images
-
+            
             // XSS protection
-            if (travel.getDescription() != null) {
-                travel.setDescription(Jsoup.clean(travel.getDescription(), Safelist.basic()));
-            }
-            if (travel.getComment() != null) {
-                travel.setComment(Jsoup.clean(travel.getComment(), Safelist.basic()));
-            }
+            sanitizeTravelData(travel);
+            
         } catch (RuntimeException e) {
             model.addAttribute("error", e.getMessage());
             return "create_new_travel";
         }
-        
         User owner = userRepository.findByUsername(principal.getName()).orElseThrow();
         travel.setOwnerName(owner.getUsername());
-
         // Make sure userTravels and owner travels lists are initialized
         if (travel.getUserTravels() == null) {
             travel.setUserTravels(new ArrayList<>());
@@ -113,37 +96,27 @@ public class TravelWebController {
         if (owner.getTravels() == null) {
             owner.setTravels(new ArrayList<>());
         }
-
         // Add travel owner
         travel.getUserTravels().add(owner);
-
-        
         // Validate form
         if (bindingResult.hasErrors()) {
             model.addAttribute("error", firstValidationError(bindingResult));
             return "create_new_travel";
         }
-
-        if (travel.getStartDate() != null && travel.getEndDate() != null
-                && travel.getEndDate().isBefore(travel.getStartDate())) {
+        if (travel.getStartDate() != null && travel.getEndDate() != null && travel.getEndDate().isBefore(travel.getStartDate())) {
             model.addAttribute("error", "La fecha de fin no puede ser anterior a la fecha de inicio");
             return "create_new_travel";
         }
-
         if (coverImage == null || coverImage.isEmpty()) {
             model.addAttribute("error", "La imagen de portada es obligatoria");
             return "create_new_travel";
         }
-
         // Cover image
         if (!coverImage.isEmpty()) {
             Image cover = imageService.createImage(coverImage);
             travel.setCoverImage(cover);
         }
-
-
         travelService.save(travel);
-
         // Carrousel images
         List<Image> images = new ArrayList<>();
         for (MultipartFile file : carouselImages) {
@@ -154,7 +127,6 @@ public class TravelWebController {
             }
         }
         travel.setCarouselImagesUrls(images);
-
         // Itinerary PDF - save in disk
         if (!itinerary.isEmpty()) {
             try {
@@ -168,94 +140,67 @@ public class TravelWebController {
                 return "create_new_travel";
             }
         }
-
         // Collaborators
         addCollaborators(travel);
-
-
         // Final save
         travelService.save(travel);
-
         return "redirect:/mytravels";
     }
 
     // Edit travel - GET
     @GetMapping("/travel/{id}/edit")
     public String editTravel(@PathVariable Long id, Model model, Principal principal) {
-        
         // verify the user is logged
         if (principal == null) {
             return "redirect:/sign_in";
         }
-
         Optional<Travel> travelOpt = travelService.findById(id);
-        
         // verify the travel exists
         if (travelOpt.isEmpty()) {
             return "redirect:/mytravels";
         }
         Travel travel = travelOpt.get();
-
         // verify the user is the owner of the travel
         boolean isOwner = isOwnerOfTravel(travel, principal.getName());
         if (!isOwner) {
-            return "error/403"; 
+            return "error/403";
         }
-
         populateEditTravelModel(model, travel);
-
         return "edit_travel";
     }
 
     // Edit travel - POST
     @PostMapping("/travel/{id}/edit")
-    public String editTravelSubmit(@PathVariable Long id, @Valid @ModelAttribute("travel") Travel travel,
-            BindingResult bindingResult,
-            @RequestParam(value = "coverImageFile", required = false) MultipartFile coverImage,
-            @RequestParam(value = "carouselImageFiles", required = false) MultipartFile[] carouselImages,
-            @RequestParam(value = "itineraryFile", required = false) MultipartFile itinerary,
-            Principal principal,
-            Model model) throws IOException {
-        
+    public String editTravelSubmit(@PathVariable Long id, @Valid @ModelAttribute("travel") Travel travel, BindingResult bindingResult, @RequestParam(value = "coverImageFile", required = false) MultipartFile coverImage, @RequestParam(value = "carouselImageFiles", required = false) MultipartFile[] carouselImages, @RequestParam(value = "itineraryFile", required = false) MultipartFile itinerary, Principal principal, Model model) throws IOException {
         // verify the user is logged
         if (principal == null) {
             return "redirect:/sign_in";
         }
-
         Optional<Travel> travelOpt = travelService.findById(id);
-
         // verify the travel exists
         if (travelOpt.isEmpty()) {
             return "error/404";
         }
         Travel existingTravel = travelOpt.get();
-        
         // verify the user is the owner of the travel
         if (!isOwnerOfTravel(existingTravel, principal.getName())) {
             return "error/403";
         }
-
         // security validations
         try {
             validateImage(coverImage);
             for (MultipartFile f : carouselImages) validateImage(f);
+            
             // XSS protection
-            if (travel.getDescription() != null) {
-                travel.setDescription(Jsoup.clean(travel.getDescription(), Safelist.basic()));
-            }
-            if (travel.getComment() != null) {
-                travel.setComment(Jsoup.clean(travel.getComment(), Safelist.basic()));
-            }
-
+            sanitizeTravelData(travel);
+            
         } catch (RuntimeException e) {
             model.addAttribute("error", e.getMessage());
             populateEditTravelModel(model, existingTravel);
             return "edit_travel";
         }
-
         travel.setId(existingTravel.getId());
         travel.setOwnerName(existingTravel.getOwnerName());
-
         // Validate form
         if (bindingResult.hasErrors()) {
             travel.setCoverImage(existingTravel.getCoverImage());
@@ -265,9 +210,7 @@ public class TravelWebController {
             populateEditTravelModel(model, travel);
             return "edit_travel";
         }
-
-        if (travel.getStartDate() != null && travel.getEndDate() != null
-                && travel.getEndDate().isBefore(travel.getStartDate())) {
+        if (travel.getStartDate() != null && travel.getEndDate() != null && travel.getEndDate().isBefore(travel.getStartDate())) {
             travel.setCoverImage(existingTravel.getCoverImage());
             travel.setCarouselImagesUrls(existingTravel.getCarouselImages());
             travel.setItineraryUrl(existingTravel.getItineraryUrl());
@@ -275,7 +218,6 @@ public class TravelWebController {
             populateEditTravelModel(model, travel);
             return "edit_travel";
         }
-
         // Update cover image if provided
         if (coverImage != null && !coverImage.isEmpty()) {
             Image cover = imageService.createImage(coverImage);
@@ -285,7 +227,6 @@ public class TravelWebController {
             // Keep existing cover image
             travel.setCoverImage(existingTravel.getCoverImage());
         }
-
         // Update carousel images if provided
         if (carouselImages != null && carouselImages.length > 0) {
             List<Image> images = new ArrayList<>();
@@ -297,12 +238,15 @@ public class TravelWebController {
                     images.add(img);
                 }
             }
-            travel.setCarouselImagesUrls(images);
+            if (!images.isEmpty()) {
+                travel.setCarouselImagesUrls(images);
+            } else {
+                travel.setCarouselImagesUrls(existingTravel.getCarouselImages());
+            }
         } else {
             // Keep existing carousel images
             travel.setCarouselImagesUrls(existingTravel.getCarouselImages());
         }
-
         // Update itinerary if provided
         if (itinerary != null && !itinerary.isEmpty()) {
             // Delete old file if exists
@@ -316,10 +260,8 @@ public class TravelWebController {
             travel.setItineraryPath(existingTravel.getItineraryPath());
             travel.setItineraryUrl(existingTravel.getItineraryUrl());
         }
-
         // Collaborators
         syncUsers(travel, principal);
-
         travelService.save(travel);
         return "redirect:/travel/" + id;
     }
@@ -327,52 +269,36 @@ public class TravelWebController {
     // One travel
     @GetMapping("/travel/{id}")
     public String oneTravel(@PathVariable Long id, Model model, Principal principal) {
-        
         // verify the user is logged
         if (principal == null) {
             return "redirect:/sign_in";
         }
-
         // verify the travel exists
         Optional<Travel> travelOpt = travelService.findById(id);
         if (travelOpt.isEmpty()) {
             return "error/404";
         }
-
         Travel travel = travelOpt.get();
         String username = principal != null ? principal.getName() : null;
-
         // verify the user is the owner or collaborator of the travel
         boolean hasAccess = isAuthorizedForTravel(travel, username);
         boolean isOwner = principal != null && travel.getOwnerName().equals(principal.getName());
-
         if (!hasAccess) {
-            return "error/403"; 
+            return "error/403";
         }
         model.addAttribute("travel", travel);
-
         model.addAttribute("isOwner", isOwner);
-
         // Countries, cities and places lists
-        List<String> countriesList = travel.getCountries() != null && !travel.getCountries().isEmpty()
-                ? List.of(travel.getCountries().split(","))
-                : List.of();
-        List<String> citiesList = travel.getCities() != null && !travel.getCities().isEmpty()
-                ? List.of(travel.getCities().split(","))
-                : List.of();
-        List<String> placesList = travel.getPlaces() != null && !travel.getPlaces().isEmpty()
-                ? List.of(travel.getPlaces().split(","))
-                : List.of();
-
+        List<String> countriesList = travel.getCountries() != null && !travel.getCountries().isEmpty() ? List.of(travel.getCountries().split(",")) : List.of();
+        List<String> citiesList = travel.getCities() != null && !travel.getCities().isEmpty() ? List.of(travel.getCities().split(",")) : List.of();
+        List<String> placesList = travel.getPlaces() != null && !travel.getPlaces().isEmpty() ? List.of(travel.getPlaces().split(",")) : List.of();
         model.addAttribute("countriesList", countriesList);
         model.addAttribute("citiesList", citiesList);
         model.addAttribute("placesList", placesList);
-
         // Booleans to check if there are countries, cities or places
         model.addAttribute("hasCountries", !countriesList.isEmpty());
         model.addAttribute("hasCities", !citiesList.isEmpty());
         model.addAttribute("hasPlaces", !placesList.isEmpty());
-
         // First carousel image
         List<Image> carouselImages = travel.getCarouselImages();
         for (int i = 0; i < carouselImages.size(); i++) {
@@ -381,7 +307,6 @@ public class TravelWebController {
         model.addAttribute("carouselImages", carouselImages);
         // Boolean to check if there are carousel images
         model.addAttribute("hasCarouselImages", !carouselImages.isEmpty());
-
         // Star ratig
         List<Integer> filledStars = new ArrayList<>();
         List<Integer> emptyStars = new ArrayList<>();
@@ -395,7 +320,6 @@ public class TravelWebController {
         }
         model.addAttribute("filledStars", filledStars);
         model.addAttribute("emptyStars", emptyStars);
-
         // Get colaborator users by email
         List<User> collaborators = new ArrayList<>();
         String emails = travel.getEmailsColaborators();
@@ -412,27 +336,22 @@ public class TravelWebController {
             }
         }
         model.addAttribute("collaborators", collaborators);
-
         return "one_travel";
     }
 
     // Delete travel
     @PostMapping("/travel/{id}/delete")
     public String deleteTravel(@PathVariable Long id, Principal principal) {
-        
         // verify the user is logged
         if (principal == null) {
             return "redirect:/sign_in";
         }
-
         // verify the travel exists
         Optional<Travel> travelOpt = travelService.findById(id);
         if (travelOpt.isEmpty()) {
             return "error/404";
         }
-
         Travel travel = travelOpt.get();
-
         // verify the user is the owner of the travel
         if (!travel.getOwnerName().equals(principal.getName())) {
             return "error/403";
@@ -443,15 +362,12 @@ public class TravelWebController {
 
     // Download itinerary
     @GetMapping("/travel/{id}/itinerary")
-    public void downloadItinerary(@PathVariable Long id, Principal principal, HttpServletResponse response)
-            throws IOException {
-
+    public void downloadItinerary(@PathVariable Long id, Principal principal, HttpServletResponse response) throws IOException {
         // 1. verify if user is logged in
         if (principal == null) {
             response.sendError(HttpServletResponse.SC_FORBIDDEN);
             return;
         }
-
         // 2. verify that the travel exists
         Optional<Travel> travelOpt = travelService.findById(id);
         if (travelOpt.isEmpty()) {
@@ -459,44 +375,33 @@ public class TravelWebController {
             return;
         }
         Travel travel = travelOpt.get();
-
         // 3. verify access: only owner and collaborators can download the itinerary
-        boolean hasAccess = principal != null && (travel.getOwnerName().equals(principal.getName()) ||
-                travel.getUserTravels().stream().anyMatch(u -> u.getUsername().equals(principal.getName())));
-
+        boolean hasAccess = principal != null && (travel.getOwnerName().equals(principal.getName()) || travel.getUserTravels().stream().anyMatch(u -> u.getUsername().equals(principal.getName())));
         if (!hasAccess) {
             response.sendError(HttpServletResponse.SC_FORBIDDEN);
             return;
         }
-
         if (!isAuthorizedForTravel(travel, principal.getName())) {
             response.sendError(HttpServletResponse.SC_FORBIDDEN);
             return;
         }
-
-        // 4. verify if the travel has itinerary 
+        // 4. verify if the travel has itinerary
         String filePath = travel.getItineraryPath();
         if (filePath == null || filePath.isEmpty()) {
             response.sendError(HttpServletResponse.SC_NOT_FOUND);
             return;
         }
-
         Path path = fileStorageService.getFilePath(filePath);
-
         if (!Files.exists(path)) {
             response.sendError(HttpServletResponse.SC_NOT_FOUND);
             return;
         }
-
         // 5. configure headers for download
         response.setContentType("application/pdf");
-        response.setHeader("Content-Disposition", "attachment; filename=\"" +
-                travel.getItineraryUrl() + "\"");
+        response.setHeader("Content-Disposition", "attachment; filename=\"" + travel.getItineraryUrl() + "\"");
         response.setContentLengthLong(Files.size(path));
-
         // 6. write file to response
-        try (InputStream inputStream = Files.newInputStream(path);
-                OutputStream outputStream = response.getOutputStream()) {
+        try (InputStream inputStream = Files.newInputStream(path); OutputStream outputStream = response.getOutputStream()) {
             inputStream.transferTo(outputStream);
         }
     }
@@ -504,16 +409,13 @@ public class TravelWebController {
     // AUXILIARY METHODS
     private void populateEditTravelModel(Model model, Travel travel) {
         model.addAttribute("travel", travel);
-
         int rating = travel.getRating();
         model.addAttribute("rating1", rating == 1);
         model.addAttribute("rating2", rating == 2);
         model.addAttribute("rating3", rating == 3);
         model.addAttribute("rating4", rating == 4);
         model.addAttribute("rating5", rating == 5);
-
-        model.addAttribute("members",
-                travel.getEmailsColaborators() != null ? travel.getEmailsColaborators() : "");
+        model.addAttribute("members", travel.getEmailsColaborators() != null ? travel.getEmailsColaborators() : "");
     }
 
     private String firstValidationError(BindingResult bindingResult) {
@@ -525,10 +427,7 @@ public class TravelWebController {
 
     private void addCollaborators(Travel travel) {
         String emails = travel.getEmailsColaborators();
-
-        if (emails == null || emails.trim().isEmpty())
-            return;
-
+        if (emails == null || emails.trim().isEmpty()) return;
         for (String email : emails.split(",")) {
             userRepository.findByEmail(email.trim()).ifPresent(user -> {
                 if (!travel.getUserTravels().contains(user)) {
@@ -539,22 +438,17 @@ public class TravelWebController {
     }
 
     private void syncUsers(Travel travel, Principal principal) {
-
         List<User> users = new ArrayList<>();
-
         // Owner
         User owner = userRepository.findByUsername(principal.getName()).orElseThrow();
         users.add(owner);
-
         // Collaborators
         String emails = travel.getEmailsColaborators();
-
         if (emails != null && !emails.trim().isEmpty()) {
             for (String email : emails.split(",")) {
                 userRepository.findByEmail(email.trim()).ifPresent(users::add);
             }
         }
-
         travel.setUserTravels(users);
     }
 
@@ -584,7 +478,6 @@ public class TravelWebController {
         }
     }
 
-    /* 
     private void sanitizeTravelData(Travel travel) {
         if (travel.getDescription() != null) {
             travel.setDescription(Jsoup.clean(travel.getDescription(), Safelist.basic()));
@@ -592,8 +485,5 @@ public class TravelWebController {
         if (travel.getComment() != null) {
             travel.setComment(Jsoup.clean(travel.getComment(), Safelist.basic()));
         }
-    }*/
-
-    
-
+    }
 }
