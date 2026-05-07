@@ -105,7 +105,10 @@ public class User {
         if (reviews != null){
             this.reviews = reviews;
         }
+        
     }
+
+    
     
     //GETTERS AND SETTERS
     public List<String> getRoles() {
