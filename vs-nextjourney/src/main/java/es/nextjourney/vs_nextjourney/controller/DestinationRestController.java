@@ -5,6 +5,8 @@ import java.sql.SQLException;
 import java.util.List;
 import java.util.Optional;
 import java.io.IOException;
+
+import javax.imageio.ImageIO;
 import javax.sql.rowset.serial.SerialBlob;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,6 +25,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.server.ResponseStatusException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
@@ -36,6 +39,7 @@ import es.nextjourney.vs_nextjourney.service.PlaceService;
 //import es.nextjourney.vs_nextjourney.service.ImageService;
 import org.jsoup.Jsoup;
 import org.jsoup.safety.Safelist;
+import java.awt.image.BufferedImage;
 
 import static org.springframework.web.servlet.support.ServletUriComponentsBuilder.fromCurrentContextPath;
 
@@ -182,7 +186,7 @@ public class DestinationRestController {
         if (!isAdmin && (destination.getOwnerName() == null || !destination.getOwnerName().equals(principal.getName()))) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
         }
-        
+        validateImage(imageFile);
         Image image = new Image();
         image.setImageFile(new SerialBlob(imageFile.getBytes()));
         image.setContentType(imageFile.getContentType());
@@ -421,4 +425,25 @@ public class DestinationRestController {
 
 		return true;
 	}
+	private void validateImage(MultipartFile file) {
+        if (file == null || file.isEmpty())
+            return;
+        String contentType = file.getContentType();
+        if (contentType == null || !contentType.startsWith("image/")) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "El archivo " + file.getOriginalFilename() + " no es una imagen válida.");
+        }
+        String name = file.getOriginalFilename().toLowerCase();
+        if (!(name.endsWith(".jpg") || name.endsWith(".jpeg") || name.endsWith(".png"))) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Solo se admiten imágenes JPG o PNG.");
+        }
+        try {
+            BufferedImage image = ImageIO.read(file.getInputStream());
+
+            if (image == null) {
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "El archivo no es una imagen válida.");
+            }
+        } catch (IOException e) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Error al procesar la imagen.");
+        }
+    }
 }

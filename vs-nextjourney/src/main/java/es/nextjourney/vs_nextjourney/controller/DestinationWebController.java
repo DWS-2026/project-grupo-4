@@ -4,10 +4,13 @@ import java.io.IOException;
 import java.security.Principal;
 import java.util.Optional;
 
+import javax.imageio.ImageIO;
+
 import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Controller;
 import org.springframework.validation.BindingResult;
 import org.springframework.ui.Model;
@@ -15,6 +18,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.server.ResponseStatusException;
 import org.springframework.security.core.Authentication;
 
 import es.nextjourney.vs_nextjourney.model.Destination;
@@ -26,6 +30,8 @@ import es.nextjourney.vs_nextjourney.service.PlaceService;
 
 import org.jsoup.Jsoup;
 import org.jsoup.safety.Safelist;
+import java.awt.image.BufferedImage;
+
 
 @Controller
 public class DestinationWebController {
@@ -85,6 +91,8 @@ public class DestinationWebController {
         }
 
         try {
+            validateImage(imageFile);
+
             destination.setDescription(Jsoup.clean(destination.getDescription(), Safelist.basic()));
             
             destination.setOwnerName(principal.getName());
@@ -155,8 +163,15 @@ public class DestinationWebController {
                 if (imageFile == null || imageFile.isEmpty()) {
                     destination.setCoverImage(oldDest.getCoverImage());
                 } else {
+                    try{
+                    validateImage(imageFile);
                     Image image = imageService.createImage(imageFile);
                     destination.setCoverImage(image);
+
+                    } catch (Exception e) {
+                        destination.setCoverImage(oldDest.getCoverImage());
+                        return showErrorDestination(model, destination, true, "No se ha podido actualizar la imagen. Revisa el archivo.", true);
+                    }
                 }
 
                 destinationService.save(destination);
@@ -289,5 +304,28 @@ public class DestinationWebController {
             return "Hay datos invalidos en el formulario.";
         }
         return bindingResult.getAllErrors().get(0).getDefaultMessage();
+    }
+    private void validateImage(MultipartFile file) {
+        if (file == null || file.isEmpty())
+            return;
+        String contentType = file.getContentType();
+        if (contentType == null || !contentType.startsWith("image/")) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "El archivo " + file.getOriginalFilename() + " no es una imagen válida.");
+        }
+        String name = file.getOriginalFilename().toLowerCase();
+        if (!(name.endsWith(".jpg") || name.endsWith(".jpeg") || name.endsWith(".png"))) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"Solo se admiten imágenes JPG o PNG.");
+        }
+        try {
+            BufferedImage image = ImageIO.read(file.getInputStream());
+
+            if (image == null) {
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "El archivo no es una imagen válida.");
+            }
+
+        } catch (IOException e) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Error al procesar la imagen.");
+        }
+
     }
 }

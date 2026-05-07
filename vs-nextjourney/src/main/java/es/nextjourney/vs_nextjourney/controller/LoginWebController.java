@@ -6,7 +6,10 @@ import java.io.IOException;
 import java.sql.SQLException;
 import java.util.regex.Pattern;
 
+import javax.imageio.ImageIO;
+
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -28,6 +31,8 @@ import jakarta.servlet.http.HttpServletRequest;
 
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.server.ResponseStatusException;
+import java.awt.image.BufferedImage;
 
 @Controller
 public class LoginWebController {
@@ -44,8 +49,8 @@ public class LoginWebController {
     @Autowired
     private UserDetailsService userDetailsService;
 
-    //Sign-in
-    @GetMapping("/sign_in") 
+    // Sign-in
+    @GetMapping("/sign_in")
     public String signIn(Principal principal) {
         if (principal != null) {
             return "redirect:/user_profile";
@@ -53,20 +58,20 @@ public class LoginWebController {
         return "sign_in";
     }
 
-    //Login error
+    // Login error
     @GetMapping("/loginerror")
     public String loginerror() {
         return "login_error";
     }
 
-    //Register (create account) - GET
+    // Register (create account) - GET
     @GetMapping("/register")
     public String register(Model model) {
         model.addAttribute("user", new User());
         return "register";
     }
 
-    //Register (create account) - POST
+    // Register (create account) - POST
     @PostMapping("/register")
     public String newUser(@Valid User user, BindingResult bindingResult,
             @RequestParam("imageFile") MultipartFile file, Model model)
@@ -93,6 +98,8 @@ public class LoginWebController {
         user.setRoles(Arrays.asList("USER"));
         user.setPassword(passwordEncoder.encode(user.getPassword()));
         if (file != null && !file.isEmpty()) {
+
+            validateImage(file);
             Image image = new Image();
             image.setImageFile(new javax.sql.rowset.serial.SerialBlob(file.getBytes()));
             image.setContentType(file.getContentType());
@@ -176,6 +183,7 @@ public class LoginWebController {
         user2.setUsername(requestedUsername);
 
         if (file != null && !file.isEmpty()) {
+            validateImage(file);
             Image image = new Image();
             image.setImageFile(new javax.sql.rowset.serial.SerialBlob(file.getBytes()));
             image.setContentType(file.getContentType());
@@ -215,10 +223,9 @@ public class LoginWebController {
         userService.modifyUser(user2);
         UserDetails userDetails = userDetailsService.loadUserByUsername(user2.getUsername());
         UsernamePasswordAuthenticationToken newAuth = new UsernamePasswordAuthenticationToken(
-            userDetails,
-            userDetails.getPassword(),
-            userDetails.getAuthorities()
-            );
+                userDetails,
+                userDetails.getPassword(),
+                userDetails.getAuthorities());
         SecurityContextHolder.getContext().setAuthentication(newAuth);
 
         return "redirect:/user_profile";
@@ -226,12 +233,12 @@ public class LoginWebController {
 
     @PostMapping("/delete_profile")
     public String deleteProfile(Principal principal, HttpServletRequest request) throws ServletException {
-    if (principal != null) {
-        User user = userService.findByUserName(principal.getName());
-        userService.deleteById(user.getId());
-        request.logout(); 
-    }
-    return "redirect:/"; 
+        if (principal != null) {
+            User user = userService.findByUserName(principal.getName());
+            userService.deleteById(user.getId());
+            request.logout();
+        }
+        return "redirect:/";
     }
 
     private boolean isPasswordPolicyValid(String password) {
@@ -243,5 +250,27 @@ public class LoginWebController {
             return "Hay datos invalidos en el formulario.";
         }
         return bindingResult.getAllErrors().get(0).getDefaultMessage();
+    }
+
+    private void validateImage(MultipartFile file) {
+        if (file == null || file.isEmpty())
+            return;
+        String contentType = file.getContentType();
+        if (contentType == null || !contentType.startsWith("image/")) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "El archivo " + file.getOriginalFilename() + " no es una imagen válida.");
+        }
+        String name = file.getOriginalFilename().toLowerCase();
+        if (!(name.endsWith(".jpg") || name.endsWith(".jpeg") || name.endsWith(".png"))) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Solo se admiten imágenes JPG o PNG.");
+        }
+        try {
+            BufferedImage image = ImageIO.read(file.getInputStream());
+
+            if (image == null) {
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "El archivo no es una imagen válida.");
+            }
+        } catch (IOException e) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Error al procesar la imagen.");
+        }
     }
 }

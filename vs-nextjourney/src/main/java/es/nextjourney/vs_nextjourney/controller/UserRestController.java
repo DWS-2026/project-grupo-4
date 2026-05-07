@@ -5,6 +5,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.server.ResponseStatusException;
 
 import es.nextjourney.vs_nextjourney.dto.UserDTO;
 import es.nextjourney.vs_nextjourney.dto.UserMapper;
@@ -18,8 +19,9 @@ import java.net.URI;
 import java.security.Principal;
 import java.util.regex.Pattern;
 import java.sql.SQLException;
+import javax.imageio.ImageIO;
 import javax.sql.rowset.serial.SerialBlob;
-
+import java.awt.image.BufferedImage;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -40,7 +42,6 @@ public class UserRestController {
     private final UserService userService;
     private final PasswordEncoder passwordEncoder;
     private final UserMapper userMapper;
-
 
     public UserRestController(UserService userService,
             PasswordEncoder passwordEncoder,
@@ -80,7 +81,6 @@ public class UserRestController {
     @PutMapping(value = { "/profile", "/profile/{id}" }, consumes = "multipart/form-data")
     public ResponseEntity<?> editProfile(@PathVariable(required = false) Long id,
             @RequestPart("user") UserDTO user,
-            @RequestPart(value = "imageFile", required = false) MultipartFile file,
             @RequestParam(required = false) String currentPassword,
             @RequestParam(required = false) String newPassword,
             @RequestParam(required = false) String confirmPassword,
@@ -114,13 +114,6 @@ public class UserRestController {
         existing.setUsername(user.username());
         existing.setEmail(user.email());
 
-        if (file != null && !file.isEmpty()) {
-            Image image = new Image();
-            image.setImageFile(new SerialBlob(file.getBytes()));
-            image.setContentType(file.getContentType());
-            existing.setImage(image);
-        }
-
         // password
         if (currentPassword != null && !currentPassword.isBlank()) {
 
@@ -150,9 +143,8 @@ public class UserRestController {
         if (principal == null) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
-        if (imageFile.isEmpty()) {
-            return ResponseEntity.badRequest().build();
-        }
+
+        validateImage(imageFile);
 
         User currentUser = userService.findByUserName(principal.getName());
         User user;
@@ -166,7 +158,10 @@ public class UserRestController {
             user = userService.findById(id);
         }
 
-        Image image = new Image();
+        Image image = user.getImage();
+        if (image == null) {
+            image = new Image();
+        }
         image.setImageFile(new SerialBlob(imageFile.getBytes()));
         image.setContentType(imageFile.getContentType());
         user.setImage(image);
@@ -232,32 +227,61 @@ public class UserRestController {
                     .body("Ha ocurrido un error al intentar eliminar el usuario");
         }
     }
+
     @DeleteMapping(value = { "/profile/image", "/profile/{id}/image" })
-    public ResponseEntity<Object> deleteProfileImage( @PathVariable(required = false) Long id,Principal principal) {
+    public ResponseEntity<Object> deleteProfileImage(@PathVariable(required = false) Long id, Principal principal) {
         if (principal == null) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
-        
+
         User currentUser = userService.findByUserName(principal.getName());
         User user;
         if (id == null) {
             user = currentUser;
         } else {
             if (!currentUser.isAdminUser() && !currentUser.getId().equals(id)) {
-                return ResponseEntity.status(HttpStatus.FORBIDDEN).body("No tienes permisos para modificar esta imagen");
+                return ResponseEntity.status(HttpStatus.FORBIDDEN)
+                        .body("No tienes permisos para modificar esta imagen");
             }
             user = userService.findById(id);
         }
+        if (user == null) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Usuario no encontrado");
+        }
+
         if (user.getImage() != null) {
             user.setImage(null);
             userService.modifyUser(user);
             return ResponseEntity.noContent().build();
         }
-        
+
         return ResponseEntity.notFound().build();
     }
 
     private boolean isPasswordPolicyValid(String password) {
         return password != null && PASSWORD_POLICY.matcher(password).matches();
     }
+
+    private void validateImage(MultipartFile file) {
+        if (file == null || file.isEmpty())
+            return;
+        String contentType = file.getContentType();
+        if (contentType == null || !contentType.startsWith("image/")) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "El archivo " + file.getOriginalFilename() + " no es una imagen válida.");
+        }
+        String name = file.getOriginalFilename().toLowerCase();
+        if (!(name.endsWith(".jpg") || name.endsWith(".jpeg") || name.endsWith(".png"))) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Solo se admiten imágenes JPG o PNG.");
+        }
+        try {
+            BufferedImage image = ImageIO.read(file.getInputStream());
+
+            if (image == null) {
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "El archivo no es una imagen válida.");
+            }
+        } catch (IOException e) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Error al procesar la imagen.");
+        }
+    }
+
 }

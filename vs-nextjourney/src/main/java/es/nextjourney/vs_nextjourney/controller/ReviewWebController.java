@@ -11,6 +11,7 @@ import java.util.Optional;
 import java.text.Normalizer;
 import java.util.regex.Pattern;
 
+import javax.imageio.ImageIO;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -21,7 +22,9 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.server.ResponseStatusException;
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.HttpStatus;
 
 import es.nextjourney.vs_nextjourney.model.Destination;
 import es.nextjourney.vs_nextjourney.model.Image;
@@ -36,7 +39,7 @@ import es.nextjourney.vs_nextjourney.service.DestinationService;
 import es.nextjourney.vs_nextjourney.service.ImageService;
 import es.nextjourney.vs_nextjourney.service.PlaceService;
 import es.nextjourney.vs_nextjourney.service.ReviewService;
-
+import java.awt.image.BufferedImage;
 @Controller
 public class ReviewWebController {
 
@@ -144,6 +147,7 @@ public class ReviewWebController {
 		if (photos != null) {
 			for (MultipartFile photo : photos) {
 				if (!photo.isEmpty()) {
+					validateImage(photo);
 					Image image = imageService.createImage(photo);
 					image.setReview(savedReview);
 					imageService.save(image);
@@ -228,6 +232,7 @@ public class ReviewWebController {
 		if (photos != null) {
 			for (MultipartFile photo : photos) {
 				if (!photo.isEmpty()) {
+					validateImage(photo);
 					Image image = imageService.createImage(photo);
 					image.setReview(savedReview);
 					imageService.save(image);
@@ -451,4 +456,25 @@ public class ReviewWebController {
 			this.averageRating = averageRating;
 		}
 	}
+	private void validateImage(MultipartFile file) {
+        if (file == null || file.isEmpty())
+            return;
+        String contentType = file.getContentType();
+        if (contentType == null || !contentType.startsWith("image/")) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "El archivo " + file.getOriginalFilename() + " no es una imagen válida.");
+        }
+        String name = file.getOriginalFilename().toLowerCase();
+        if (!(name.endsWith(".jpg") || name.endsWith(".jpeg") || name.endsWith(".png"))) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Solo se admiten imágenes JPG o PNG.");
+        }
+        try {
+            BufferedImage image = ImageIO.read(file.getInputStream());
+
+            if (image == null) {
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "El archivo no es una imagen válida.");
+            }
+        } catch (IOException e) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Error al procesar la imagen.");
+        }
+    }
 }

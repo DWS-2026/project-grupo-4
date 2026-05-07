@@ -3,11 +3,12 @@ package es.nextjourney.vs_nextjourney.controller;
 import java.net.URI;
 import java.security.Principal;
 import java.time.LocalDate;
-import java.util.List;
 import java.util.Optional;
 import java.sql.SQLException;
-import javax.sql.rowset.serial.SerialBlob;
+
+import javax.imageio.ImageIO;
 import java.io.IOException;
+import java.awt.image.BufferedImage;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -24,6 +25,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.server.ResponseStatusException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
@@ -37,6 +39,7 @@ import es.nextjourney.vs_nextjourney.repository.UserRepository;
 import es.nextjourney.vs_nextjourney.service.PlaceService;
 import es.nextjourney.vs_nextjourney.service.ReviewService;
 import es.nextjourney.vs_nextjourney.service.ImageService;
+
 
 import static org.springframework.web.servlet.support.ServletUriComponentsBuilder.fromCurrentContextPath;
 
@@ -218,6 +221,7 @@ public class ReviewRestController {
 		}
 
 		if (imageFile.isEmpty()) return ResponseEntity.badRequest().build();
+		validateImage(imageFile);
 
 		Image image = imageService.createImage(imageFile);
 		image.setReview(review); 
@@ -329,4 +333,27 @@ public class ReviewRestController {
 		String normalized = reviewText.trim();
 		return !normalized.isBlank() && normalized.length() <= MAX_REVIEW_LENGTH;
 	}
+
+	private void validateImage(MultipartFile file) {
+        if (file == null || file.isEmpty())
+            return;
+        String contentType = file.getContentType();
+        if (contentType == null || !contentType.startsWith("image/")) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "El archivo " + file.getOriginalFilename() + " no es una imagen válida.");
+        }
+        String name = file.getOriginalFilename().toLowerCase();
+        if (!(name.endsWith(".jpg") || name.endsWith(".jpeg") || name.endsWith(".png"))) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Solo se admiten imágenes JPG o PNG.");
+        }
+        try {
+            BufferedImage image = ImageIO.read(file.getInputStream());
+
+            if (image == null) {
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "El archivo no es una imagen válida.");
+            }
+        } catch (IOException e) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Error al procesar la imagen.");
+        }
+    }
+	
 }
