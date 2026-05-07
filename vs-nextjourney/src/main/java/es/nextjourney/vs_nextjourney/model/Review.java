@@ -4,6 +4,9 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.jsoup.Jsoup;
+import org.jsoup.safety.Safelist;
+
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -14,7 +17,6 @@ import jakarta.persistence.Id;
 import jakarta.persistence.Lob;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
-import jakarta.persistence.OneToOne;
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
@@ -69,7 +71,7 @@ public class Review {
     public Review(User user, int rating, String reviewText, LocalDate createdAt, List<Image> images, Place place, Destination destination) {
         this.userReviews = user;
         setRating(rating);
-        this.reviewText = reviewText;
+        setReviewText(reviewText);
         this.createdAt = createdAt;
         this.images = new ArrayList<>();
         if (images != null){
@@ -96,11 +98,11 @@ public class Review {
     }
 
     public String getReviewText() {
-        return reviewText;
+        return sanitizeReviewText(reviewText);
     }
 
     public void setReviewText(String reviewText) {
-        this.reviewText = reviewText;
+        this.reviewText = sanitizeReviewText(reviewText);
     }
 
     public LocalDate getCreatedAt() {
@@ -166,7 +168,7 @@ public class Review {
         StringBuilder sb = new StringBuilder();
         sb.append("Review [id=").append(id)
           .append(", rating=").append(rating)
-          .append(", reviewText=").append(reviewText)
+                    .append(", reviewText=").append(getReviewText())
           .append(", createdAt=").append(createdAt)
           .append(", username=").append(userReviews.getName());
           if (destination != null){
@@ -177,6 +179,14 @@ public class Review {
           }
         sb.append("]");
         return sb.toString();
+    }
+
+    private String sanitizeReviewText(String text) {
+        if (text == null) {
+            return null;
+        }
+
+        return Jsoup.clean(text, Safelist.basic());
     }
 
 }
