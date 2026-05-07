@@ -1536,18 +1536,17 @@
                 },
                 {
                   "key": "password",
-                  "value": "1234",
+                  "value": "grupo4",
                   "type": "text"
                 }
               ]
             },
             "url": {
-              "raw": "{{baseURL}}/api/v1/auth/login",
+              "raw": "{{baseURL}}api/v1/auth/login",
               "host": [
-                "{{baseURL}}"
+                "{{baseURL}}api"
               ],
               "path": [
-                "api",
                 "v1",
                 "auth",
                 "login"
