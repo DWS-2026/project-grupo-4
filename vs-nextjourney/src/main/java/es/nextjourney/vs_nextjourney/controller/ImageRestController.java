@@ -40,12 +40,12 @@ public class ImageRestController {
 	private ImageMapper imageMapper;
 
 
-    @GetMapping({"", "/"})
+    /*@GetMapping({"", "/"})
     public ResponseEntity<Page<ImageDTO>> getAllImages(Pageable pageable) {
         Page<ImageDTO> images = imageService.findAll(pageable)
                 .map(imageMapper::toDTO);
         return ResponseEntity.ok(images);
-    }
+    }*/
 
 	@GetMapping("/{id}")
 	public ImageDTO getImage(@PathVariable long id) {

@@ -10,6 +10,7 @@ import es.nextjourney.vs_nextjourney.model.Travel;
 import es.nextjourney.vs_nextjourney.service.FileStorageService;
 import es.nextjourney.vs_nextjourney.service.ImageService;
 import es.nextjourney.vs_nextjourney.service.TravelService;
+import java.awt.image.BufferedImage;
 
 import org.jsoup.Jsoup;
 import org.jsoup.safety.Safelist;
@@ -27,8 +28,7 @@ import java.net.URI;
 import java.security.Principal;
 import java.util.Optional;
 
-import javax.sql.rowset.serial.SerialBlob;
-
+import javax.imageio.ImageIO;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 
@@ -52,8 +52,9 @@ public class TravelRestController {
     private FileStorageService fileStorageService;
 
     // GET all travels - admin sees all, regular users see only their own
-    @GetMapping({"", "/"})
-    public ResponseEntity<Page<TravelDTO>> getMyTravels(Principal principal, Pageable pageable, Authentication authentication) {
+    @GetMapping({ "", "/" })
+    public ResponseEntity<Page<TravelDTO>> getMyTravels(Principal principal, Pageable pageable,
+            Authentication authentication) {
         if (principal == null) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
@@ -74,13 +75,14 @@ public class TravelRestController {
             travels = travelService.findAllByUser(principal.getName(), pageable)
                     .map(travelMapper::toDTO);
         }
-        
+
         return ResponseEntity.ok(travels);
     }
 
     // GET one travel - admin can see any travel, regular users see only their own
     @GetMapping("/{id}")
-    public ResponseEntity<TravelDTO> getOneTravel(@PathVariable Long id, Principal principal, Authentication authentication) {
+    public ResponseEntity<TravelDTO> getOneTravel(@PathVariable Long id, Principal principal,
+            Authentication authentication) {
 
         // check if is logged in
         if (principal == null) {
@@ -109,8 +111,9 @@ public class TravelRestController {
 
     // POST create travel
     @PostMapping
-    public ResponseEntity<TravelDTO> createTravel(@RequestBody TravelDTO travelDTO, Principal principal, Authentication authentication) {
-        
+    public ResponseEntity<TravelDTO> createTravel(@RequestBody TravelDTO travelDTO, Principal principal,
+            Authentication authentication) {
+
         // check if is logged in
         if (principal == null) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
@@ -143,7 +146,8 @@ public class TravelRestController {
 
     // PUT update travel
     @PutMapping("/{id}")
-    public ResponseEntity<TravelDTO> updateTravel(@PathVariable Long id, @RequestBody TravelDTO travelDTO, Principal principal, Authentication authentication) {
+    public ResponseEntity<TravelDTO> updateTravel(@PathVariable Long id, @RequestBody TravelDTO travelDTO,
+            Principal principal, Authentication authentication) {
 
         // check if is logged in
         if (principal == null) {
@@ -188,7 +192,8 @@ public class TravelRestController {
 
     // DELETE travel
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteTravel(@PathVariable Long id, Principal principal, Authentication authentication) {
+    public ResponseEntity<Void> deleteTravel(@PathVariable Long id, Principal principal,
+            Authentication authentication) {
 
         // check if is logged in
         if (principal == null) {
@@ -203,7 +208,8 @@ public class TravelRestController {
 
         Travel travel = travelOpt.get();
 
-        // security check: only the owner or admin can delete the travel (collaborator can not delete)
+        // security check: only the owner or admin can delete the travel (collaborator
+        // can not delete)
         if (!isAuthorizedForTravel(travel, principal.getName())) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
         }
@@ -224,8 +230,8 @@ public class TravelRestController {
 
     // POST add image to carouselImages in travel
     @PostMapping("/{id}/images")
-    public ResponseEntity<ImageDTO> createTravelImage(@PathVariable long id, 
-            @RequestParam("imageFile") MultipartFile imageFile, 
+    public ResponseEntity<ImageDTO> createTravelImage(@PathVariable long id,
+            @RequestParam("imageFile") MultipartFile imageFile,
             Principal principal, Authentication authentication) throws IOException {
 
         // check if user is logged in
@@ -240,7 +246,7 @@ public class TravelRestController {
         }
 
         Travel travel = travelOpt.get();
-        
+
         // check if the user has ADMIN role
         boolean isAdmin = authentication != null && authentication.getAuthorities().stream()
                 .map(GrantedAuthority::getAuthority)
@@ -254,7 +260,7 @@ public class TravelRestController {
         if (imageFile.isEmpty()) {
             return ResponseEntity.badRequest().build();
         }
-
+        validateImage(imageFile);
         Image image = imageService.createImage(imageFile);
         image.setTravelImage(travel);
         imageService.save(image);
@@ -298,7 +304,7 @@ public class TravelRestController {
         if (imageFile.isEmpty()) {
             return ResponseEntity.badRequest().build();
         }
-
+        validateImage(imageFile);
         Image existingCover = travel.getCoverImage();
         if (existingCover != null && existingCover.getId() != null) {
             imageService.deleteImageById(existingCover.getId());
@@ -450,7 +456,7 @@ public class TravelRestController {
 
     // DELETE remove image from carouselImages in travel
     @DeleteMapping("/{id}/images/{imageId}")
-    public ResponseEntity<Void> deleteTravelImage(@PathVariable long id, 
+    public ResponseEntity<Void> deleteTravelImage(@PathVariable long id,
             @PathVariable long imageId,
             Principal principal, Authentication authentication) throws IOException {
 
@@ -466,7 +472,7 @@ public class TravelRestController {
         }
 
         Travel travel = travelOpt.get();
-        
+
         // check if the user has ADMIN role
         boolean isAdmin = authentication != null && authentication.getAuthorities().stream()
                 .map(GrantedAuthority::getAuthority)
@@ -506,19 +512,42 @@ public class TravelRestController {
     }
 
     private void sanitizeTravelData(Travel travel) {
-    // XSS protection
-    
-    if (travel.getTitle() != null) {
-        // the title can't contain any html tag 
-        travel.setTitle(Jsoup.clean(travel.getTitle(), Safelist.none()));
+        // XSS protection
+
+        if (travel.getTitle() != null) {
+            // the title can't contain any html tag
+            travel.setTitle(Jsoup.clean(travel.getTitle(), Safelist.none()));
+        }
+
+        if (travel.getDescription() != null) {
+            travel.setDescription(Jsoup.clean(travel.getDescription(), Safelist.basic()));
+        }
+
+        if (travel.getComment() != null) {
+            travel.setComment(Jsoup.clean(travel.getComment(), Safelist.basic()));
+        }
     }
-    
-    if (travel.getDescription() != null) {
-        travel.setDescription(Jsoup.clean(travel.getDescription(), Safelist.basic()));
+
+    private void validateImage(MultipartFile file) {
+        if (file == null || file.isEmpty())
+            return;
+        String contentType = file.getContentType();
+        if (contentType == null || !contentType.startsWith("image/")) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
+                    "El archivo " + file.getOriginalFilename() + " no es una imagen válida.");
+        }
+        String name = file.getOriginalFilename().toLowerCase();
+        if (!(name.endsWith(".jpg") || name.endsWith(".jpeg") || name.endsWith(".png"))) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Solo se admiten imágenes JPG o PNG.");
+        }
+        try {
+            BufferedImage image = ImageIO.read(file.getInputStream());
+
+            if (image == null) {
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "El archivo no es una imagen válida.");
+            }
+        } catch (IOException e) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Error al procesar la imagen.");
+        }
     }
-    
-    if (travel.getComment() != null) {
-        travel.setComment(Jsoup.clean(travel.getComment(), Safelist.basic()));
-    }
-}
 }

@@ -2,7 +2,6 @@ package es.nextjourney.vs_nextjourney.controller;
 
 import java.net.URI;
 import java.sql.SQLException;
-import java.util.List;
 import java.util.Optional;
 import java.io.IOException;
 
