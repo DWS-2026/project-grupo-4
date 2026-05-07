@@ -16,8 +16,10 @@ import es.nextjourney.vs_nextjourney.service.UserService;
 import jakarta.servlet.http.HttpServletRequest;
 import java.io.IOException;
 import java.net.URI;
+import java.util.List;
 import java.security.Principal;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 import java.sql.SQLException;
 import javax.imageio.ImageIO;
 import javax.sql.rowset.serial.SerialBlob;
@@ -51,6 +53,25 @@ public class UserRestController {
         this.userService = userService;
         this.passwordEncoder = passwordEncoder;
         this.userMapper = userMapper;
+    }
+    
+    @GetMapping({ "/profiles" })
+    public ResponseEntity<?> listAllUsers(Principal principal) {
+        if (principal == null) 
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+
+        User currentUser = userService.findByUserName(principal.getName());
+
+        // Verificación de seguridad: Solo ADMIN
+        if (!currentUser.isAdminUser()) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN)
+                    .body("No tienes permisos de administrador");
+        }
+
+        List<User> users = userService.findAll();
+        return ResponseEntity.ok(users.stream()
+                                     .map(userMapper::toDTO)
+                                     .collect(Collectors.toList()));
     }
 
     @GetMapping({ "/profile", "/profile/{id}" })
