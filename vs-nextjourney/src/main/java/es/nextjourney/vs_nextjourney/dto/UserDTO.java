@@ -7,10 +7,10 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 public record UserDTO(
     Long id,
     String username,
-    String name,      // Add this
-    String lastName,  // Add this
+    String name,      
+    String lastName,  
     String email,
-    String dateOfBirth, // Add this (ensure your mapper handles the String -> Date conversion)
+    String dateOfBirth,
     @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     String password,
     ImageDTO image,
