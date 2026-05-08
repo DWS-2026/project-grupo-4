@@ -1289,7 +1289,16 @@ ul.nav-tabs {
     "username" : {
       "type" : "string"
     },
+    "name" : {
+      "type" : "string"
+    },
+    "lastName" : {
+      "type" : "string"
+    },
     "email" : {
+      "type" : "string"
+    },
+    "dateOfBirth" : {
       "type" : "string"
     },
     "password" : {
@@ -1436,6 +1445,9 @@ ul.nav-tabs {
                     </li>
                     <li data-group="Usuarios" data-name="editProfile1" class="">
                       <a href="#api-Usuarios-editProfile1">editProfile1</a>
+                    </li>
+                    <li data-group="Usuarios" data-name="listAllUsers" class="">
+                      <a href="#api-Usuarios-listAllUsers">listAllUsers</a>
                     </li>
                     <li data-group="Usuarios" data-name="profile" class="">
                       <a href="#api-Usuarios-profile">profile</a>
@@ -2589,13 +2601,16 @@ public class AutenticacinApiExample {
         AutenticacinApi apiInstance = new AutenticacinApi();
         Long id = 789; // Long | 
         String username = username_example; // String | 
+        String name = name_example; // String | 
+        String lastName = lastName_example; // String | 
         String email = email_example; // String | 
+        String dateOfBirth = dateOfBirth_example; // String | 
         String password = password_example; // String | 
         ImageDTO image = ; // ImageDTO | 
         array[String] roles = ; // array[String] | 
 
         try {
-            Object result = apiInstance.register(id, username, email, password, image, roles);
+            Object result = apiInstance.register(id, username, name, lastName, email, dateOfBirth, password, image, roles);
             System.out.println(result);
         } catch (ApiException e) {
             System.err.println("Exception when calling AutenticacinApi#register");
@@ -2613,13 +2628,16 @@ final api_instance = DefaultApi();
 
 final Long id = new Long(); // Long | 
 final String username = new String(); // String | 
+final String name = new String(); // String | 
+final String lastName = new String(); // String | 
 final String email = new String(); // String | 
+final String dateOfBirth = new String(); // String | 
 final String password = new String(); // String | 
 final ImageDTO image = new ImageDTO(); // ImageDTO | 
 final array[String] roles = new array[String](); // array[String] | 
 
 try {
-    final result = await api_instance.register(id, username, email, password, image, roles);
+    final result = await api_instance.register(id, username, name, lastName, email, dateOfBirth, password, image, roles);
     print(result);
 } catch (e) {
     print('Exception when calling DefaultApi->register: $e\n');
@@ -2636,13 +2654,16 @@ public class AutenticacinApiExample {
         AutenticacinApi apiInstance = new AutenticacinApi();
         Long id = 789; // Long | 
         String username = username_example; // String | 
+        String name = name_example; // String | 
+        String lastName = lastName_example; // String | 
         String email = email_example; // String | 
+        String dateOfBirth = dateOfBirth_example; // String | 
         String password = password_example; // String | 
         ImageDTO image = ; // ImageDTO | 
         array[String] roles = ; // array[String] | 
 
         try {
-            Object result = apiInstance.register(id, username, email, password, image, roles);
+            Object result = apiInstance.register(id, username, name, lastName, email, dateOfBirth, password, image, roles);
             System.out.println(result);
         } catch (ApiException e) {
             System.err.println("Exception when calling AutenticacinApi#register");
@@ -2662,14 +2683,20 @@ public class AutenticacinApiExample {
 AutenticacinApi *apiInstance = [[AutenticacinApi alloc] init];
 Long *id = 789; //  (optional) (default to null)
 String *username = username_example; //  (optional) (default to null)
+String *name = name_example; //  (optional) (default to null)
+String *lastName = lastName_example; //  (optional) (default to null)
 String *email = email_example; //  (optional) (default to null)
+String *dateOfBirth = dateOfBirth_example; //  (optional) (default to null)
 String *password = password_example; //  (optional) (default to null)
 ImageDTO *image = ; //  (optional) (default to null)
 array[String] *roles = ; //  (optional) (default to null)
 
 [apiInstance registerWith:id
     username:username
+    name:name
+    lastName:lastName
     email:email
+    dateOfBirth:dateOfBirth
     password:password
     image:image
     roles:roles
@@ -2692,7 +2719,10 @@ var api = new NextJourneyRestApi.AutenticacinApi()
 var opts = {
   'id': 789, // {Long} 
   'username': username_example, // {String} 
+  'name': name_example, // {String} 
+  'lastName': lastName_example, // {String} 
   'email': email_example, // {String} 
+  'dateOfBirth': dateOfBirth_example, // {String} 
   'password': password_example, // {String} 
   'image': , // {ImageDTO} 
   'roles':  // {array[String]} 
@@ -2730,13 +2760,16 @@ namespace Example
             var apiInstance = new AutenticacinApi();
             var id = 789;  // Long |  (optional)  (default to null)
             var username = username_example;  // String |  (optional)  (default to null)
+            var name = name_example;  // String |  (optional)  (default to null)
+            var lastName = lastName_example;  // String |  (optional)  (default to null)
             var email = email_example;  // String |  (optional)  (default to null)
+            var dateOfBirth = dateOfBirth_example;  // String |  (optional)  (default to null)
             var password = password_example;  // String |  (optional)  (default to null)
             var image = new ImageDTO(); // ImageDTO |  (optional)  (default to null)
             var roles = new array[String](); // array[String] |  (optional)  (default to null)
 
             try {
-                Object result = apiInstance.register(id, username, email, password, image, roles);
+                Object result = apiInstance.register(id, username, name, lastName, email, dateOfBirth, password, image, roles);
                 Debug.WriteLine(result);
             } catch (Exception e) {
                 Debug.Print("Exception when calling AutenticacinApi.register: " + e.Message );
@@ -2755,13 +2788,16 @@ require_once(__DIR__ . '/vendor/autoload.php');
 $api_instance = new OpenAPITools\Client\Api\AutenticacinApi();
 $id = 789; // Long | 
 $username = username_example; // String | 
+$name = name_example; // String | 
+$lastName = lastName_example; // String | 
 $email = email_example; // String | 
+$dateOfBirth = dateOfBirth_example; // String | 
 $password = password_example; // String | 
 $image = ; // ImageDTO | 
 $roles = ; // array[String] | 
 
 try {
-    $result = $api_instance->register($id, $username, $email, $password, $image, $roles);
+    $result = $api_instance->register($id, $username, $name, $lastName, $email, $dateOfBirth, $password, $image, $roles);
     print_r($result);
 } catch (Exception $e) {
     echo 'Exception when calling AutenticacinApi->register: ', $e->getMessage(), PHP_EOL;
@@ -2778,13 +2814,16 @@ use WWW::OPenAPIClient::AutenticacinApi;
 my $api_instance = WWW::OPenAPIClient::AutenticacinApi->new();
 my $id = 789; # Long | 
 my $username = username_example; # String | 
+my $name = name_example; # String | 
+my $lastName = lastName_example; # String | 
 my $email = email_example; # String | 
+my $dateOfBirth = dateOfBirth_example; # String | 
 my $password = password_example; # String | 
 my $image = ; # ImageDTO | 
 my $roles = []; # array[String] | 
 
 eval {
-    my $result = $api_instance->register(id => $id, username => $username, email => $email, password => $password, image => $image, roles => $roles);
+    my $result = $api_instance->register(id => $id, username => $username, name => $name, lastName => $lastName, email => $email, dateOfBirth => $dateOfBirth, password => $password, image => $image, roles => $roles);
     print Dumper($result);
 };
 if ($@) {
@@ -2803,13 +2842,16 @@ from pprint import pprint
 api_instance = openapi_client.AutenticacinApi()
 id = 789 # Long |  (optional) (default to null)
 username = username_example # String |  (optional) (default to null)
+name = name_example # String |  (optional) (default to null)
+lastName = lastName_example # String |  (optional) (default to null)
 email = email_example # String |  (optional) (default to null)
+dateOfBirth = dateOfBirth_example # String |  (optional) (default to null)
 password = password_example # String |  (optional) (default to null)
 image =  # ImageDTO |  (optional) (default to null)
 roles =  # array[String] |  (optional) (default to null)
 
 try:
-    api_response = api_instance.register(id=id, username=username, email=email, password=password, image=image, roles=roles)
+    api_response = api_instance.register(id=id, username=username, name=name, lastName=lastName, email=email, dateOfBirth=dateOfBirth, password=password, image=image, roles=roles)
     pprint(api_response)
 except ApiException as e:
     print("Exception when calling AutenticacinApi->register: %s\n" % e)</code></pre>
@@ -2821,13 +2863,16 @@ except ApiException as e:
 pub fn main() {
     let id = 789; // Long
     let username = username_example; // String
+    let name = name_example; // String
+    let lastName = lastName_example; // String
     let email = email_example; // String
+    let dateOfBirth = dateOfBirth_example; // String
     let password = password_example; // String
     let image = ; // ImageDTO
     let roles = ; // array[String]
 
     let mut context = AutenticacinApi::Context::default();
-    let result = client.register(id, username, email, password, image, roles, &context).wait();
+    let result = client.register(id, username, name, lastName, email, dateOfBirth, password, image, roles, &context).wait();
 
     println!("{:?}", result);
 }
@@ -2888,11 +2933,62 @@ pub fn main() {
 </td>
 </tr>
 
+                                  <tr><td style="width:150px;">name</td>
+<td>
+
+
+    <div id="d2e199_register_name">
+        <div class="json-schema-view">
+            <div class="primitive">
+                <span class="type">
+                    String
+                </span>
+
+            </div>
+        </div>
+    </div>
+</td>
+</tr>
+
+                                  <tr><td style="width:150px;">lastName</td>
+<td>
+
+
+    <div id="d2e199_register_lastName">
+        <div class="json-schema-view">
+            <div class="primitive">
+                <span class="type">
+                    String
+                </span>
+
+            </div>
+        </div>
+    </div>
+</td>
+</tr>
+
                                   <tr><td style="width:150px;">email</td>
 <td>
 
 
     <div id="d2e199_register_email">
+        <div class="json-schema-view">
+            <div class="primitive">
+                <span class="type">
+                    String
+                </span>
+
+            </div>
+        </div>
+    </div>
+</td>
+</tr>
+
+                                  <tr><td style="width:150px;">dateOfBirth</td>
+<td>
+
+
+    <div id="d2e199_register_dateOfBirth">
         <div class="json-schema-view">
             <div class="primitive">
                 <span class="type">
@@ -15211,6 +15307,331 @@ pub fn main() {
                                   </script>
                                 </div>
                                 <input id='responses-Usuarios-editProfile1-200-schema-data' type='hidden' value=''></input>
+                              </div>
+                            </div>
+                        </article>
+                      </div>
+                      <hr>
+                    <div id="api-Usuarios-listAllUsers">
+                      <article id="api-Usuarios-listAllUsers-0" data-group="User" data-name="listAllUsers" data-version="0">
+                        <div class="pull-left">
+                          <h1>listAllUsers</h1>
+                          <p></p>
+                        </div>
+                        <div class="pull-right"></div>
+                        <div class="clearfix"></div>
+                        <p></p>
+                        <p class="marked"></p>
+                        <p></p>
+                        <br />
+                        <pre class="prettyprint language-html prettyprinted" data-type="get"><code><span class="pln">/api/v1/users/profiles</span></code></pre>
+                        <p>
+                          <h3>Usage and SDK Samples</h3>
+                        </p>
+                        <ul class="nav nav-tabs nav-tabs-examples">
+                          <li class="active"><a href="#examples-Usuarios-listAllUsers-0-curl">Curl</a></li>
+                          <li class=""><a href="#examples-Usuarios-listAllUsers-0-java">Java</a></li>
+                          <li class=""><a href="#examples-Usuarios-listAllUsers-0-dart">Dart</a></li>
+                          <li class=""><a href="#examples-Usuarios-listAllUsers-0-android">Android</a></li>
+                          <!--<li class=""><a href="#examples-Usuarios-listAllUsers-0-groovy">Groovy</a></li>-->
+                          <li class=""><a href="#examples-Usuarios-listAllUsers-0-objc">Obj-C</a></li>
+                          <li class=""><a href="#examples-Usuarios-listAllUsers-0-javascript">JavaScript</a></li>
+                          <!--<li class=""><a href="#examples-Usuarios-listAllUsers-0-angular">Angular</a></li>-->
+                          <li class=""><a href="#examples-Usuarios-listAllUsers-0-csharp">C#</a></li>
+                          <li class=""><a href="#examples-Usuarios-listAllUsers-0-php">PHP</a></li>
+                          <li class=""><a href="#examples-Usuarios-listAllUsers-0-perl">Perl</a></li>
+                          <li class=""><a href="#examples-Usuarios-listAllUsers-0-python">Python</a></li>
+                          <li class=""><a href="#examples-Usuarios-listAllUsers-0-rust">Rust</a></li>
+                        </ul>
+
+                        <div class="tab-content">
+                          <div class="tab-pane active" id="examples-Usuarios-listAllUsers-0-curl">
+                            <pre class="prettyprint"><code class="language-bsh">curl -X GET \
+ -H "Accept: */*" \
+ "https://localhost:8443/api/v1/users/profiles"
+</code></pre>
+                          </div>
+                          <div class="tab-pane" id="examples-Usuarios-listAllUsers-0-java">
+                            <pre class="prettyprint"><code class="language-java">import org.openapitools.client.*;
+import org.openapitools.client.auth.*;
+import org.openapitools.client.model.*;
+import org.openapitools.client.api.UsuariosApi;
+
+import java.io.File;
+import java.util.*;
+
+public class UsuariosApiExample {
+    public static void main(String[] args) {
+
+        // Create an instance of the API class
+        UsuariosApi apiInstance = new UsuariosApi();
+
+        try {
+            Object result = apiInstance.listAllUsers();
+            System.out.println(result);
+        } catch (ApiException e) {
+            System.err.println("Exception when calling UsuariosApi#listAllUsers");
+            e.printStackTrace();
+        }
+    }
+}
+</code></pre>
+                          </div>
+
+                          <div class="tab-pane" id="examples-Usuarios-listAllUsers-0-dart">
+                            <pre class="prettyprint"><code class="language-dart">import 'package:openapi/api.dart';
+
+final api_instance = DefaultApi();
+
+
+try {
+    final result = await api_instance.listAllUsers();
+    print(result);
+} catch (e) {
+    print('Exception when calling DefaultApi->listAllUsers: $e\n');
+}
+
+</code></pre>
+                          </div>
+
+                          <div class="tab-pane" id="examples-Usuarios-listAllUsers-0-android">
+                            <pre class="prettyprint"><code class="language-java">import org.openapitools.client.api.UsuariosApi;
+
+public class UsuariosApiExample {
+    public static void main(String[] args) {
+        UsuariosApi apiInstance = new UsuariosApi();
+
+        try {
+            Object result = apiInstance.listAllUsers();
+            System.out.println(result);
+        } catch (ApiException e) {
+            System.err.println("Exception when calling UsuariosApi#listAllUsers");
+            e.printStackTrace();
+        }
+    }
+}</code></pre>
+                          </div>
+  <!--
+  <div class="tab-pane" id="examples-Usuarios-listAllUsers-0-groovy">
+  <pre class="prettyprint language-json prettyprinted" data-type="json"><code>Coming Soon!</code></pre>
+  </div> -->
+                            <div class="tab-pane" id="examples-Usuarios-listAllUsers-0-objc">
+                              <pre class="prettyprint"><code class="language-cpp">
+
+// Create an instance of the API class
+UsuariosApi *apiInstance = [[UsuariosApi alloc] init];
+
+[apiInstance listAllUsersWithCompletionHandler: 
+              ^(Object output, NSError* error) {
+    if (output) {
+        NSLog(@"%@", output);
+    }
+    if (error) {
+        NSLog(@"Error: %@", error);
+    }
+}];
+</code></pre>
+                            </div>
+
+                            <div class="tab-pane" id="examples-Usuarios-listAllUsers-0-javascript">
+                              <pre class="prettyprint"><code class="language-js">var NextJourneyRestApi = require('next_journey_rest_api');
+
+// Create an instance of the API class
+var api = new NextJourneyRestApi.UsuariosApi()
+var callback = function(error, data, response) {
+  if (error) {
+    console.error(error);
+  } else {
+    console.log('API called successfully. Returned data: ' + data);
+  }
+};
+api.listAllUsers(callback);
+</code></pre>
+                            </div>
+
+                            <!--<div class="tab-pane" id="examples-Usuarios-listAllUsers-0-angular">
+              <pre class="prettyprint language-json prettyprinted" data-type="json"><code>Coming Soon!</code></pre>
+            </div>-->
+                            <div class="tab-pane" id="examples-Usuarios-listAllUsers-0-csharp">
+                              <pre class="prettyprint"><code class="language-cs">using System;
+using System.Diagnostics;
+using Org.OpenAPITools.Api;
+using Org.OpenAPITools.Client;
+using Org.OpenAPITools.Model;
+
+namespace Example
+{
+    public class listAllUsersExample
+    {
+        public void main()
+        {
+
+            // Create an instance of the API class
+            var apiInstance = new UsuariosApi();
+
+            try {
+                Object result = apiInstance.listAllUsers();
+                Debug.WriteLine(result);
+            } catch (Exception e) {
+                Debug.Print("Exception when calling UsuariosApi.listAllUsers: " + e.Message );
+            }
+        }
+    }
+}
+</code></pre>
+                            </div>
+
+                            <div class="tab-pane" id="examples-Usuarios-listAllUsers-0-php">
+                              <pre class="prettyprint"><code class="language-php"><&#63;php
+require_once(__DIR__ . '/vendor/autoload.php');
+
+// Create an instance of the API class
+$api_instance = new OpenAPITools\Client\Api\UsuariosApi();
+
+try {
+    $result = $api_instance->listAllUsers();
+    print_r($result);
+} catch (Exception $e) {
+    echo 'Exception when calling UsuariosApi->listAllUsers: ', $e->getMessage(), PHP_EOL;
+}
+?></code></pre>
+                            </div>
+
+                            <div class="tab-pane" id="examples-Usuarios-listAllUsers-0-perl">
+                              <pre class="prettyprint"><code class="language-perl">use Data::Dumper;
+use WWW::OPenAPIClient::Configuration;
+use WWW::OPenAPIClient::UsuariosApi;
+
+# Create an instance of the API class
+my $api_instance = WWW::OPenAPIClient::UsuariosApi->new();
+
+eval {
+    my $result = $api_instance->listAllUsers();
+    print Dumper($result);
+};
+if ($@) {
+    warn "Exception when calling UsuariosApi->listAllUsers: $@\n";
+}</code></pre>
+                            </div>
+
+                            <div class="tab-pane" id="examples-Usuarios-listAllUsers-0-python">
+                              <pre class="prettyprint"><code class="language-python">from __future__ import print_statement
+import time
+import openapi_client
+from openapi_client.rest import ApiException
+from pprint import pprint
+
+# Create an instance of the API class
+api_instance = openapi_client.UsuariosApi()
+
+try:
+    api_response = api_instance.list_all_users()
+    pprint(api_response)
+except ApiException as e:
+    print("Exception when calling UsuariosApi->listAllUsers: %s\n" % e)</code></pre>
+                            </div>
+
+                            <div class="tab-pane" id="examples-Usuarios-listAllUsers-0-rust">
+                              <pre class="prettyprint"><code class="language-rust">extern crate UsuariosApi;
+
+pub fn main() {
+
+    let mut context = UsuariosApi::Context::default();
+    let result = client.listAllUsers(&context).wait();
+
+    println!("{:?}", result);
+}
+</code></pre>
+                            </div>
+                          </div>
+
+                          <h2>Scopes</h2>
+                          <table>
+                            
+                          </table>
+
+                          <h2>Parameters</h2>
+
+
+
+
+
+
+                          <h2>Responses</h2>
+                            <h3 id="examples-Usuarios-listAllUsers-title-200"></h3>
+                            <p id="examples-Usuarios-listAllUsers-description-200" class="marked"></p>
+                            <script>
+                              var responseUsuarios200_description = `OK`;
+                              var responseUsuarios200_description_break = responseUsuarios200_description.indexOf('\n');
+                              if (responseUsuarios200_description_break == -1) {
+                                $("#examples-Usuarios-listAllUsers-title-200").text("Status: 200 - " + responseUsuarios200_description);
+                              } else {
+                                $("#examples-Usuarios-listAllUsers-title-200").text("Status: 200 - " + responseUsuarios200_description.substring(0, responseUsuarios200_description_break));
+                                $("#examples-Usuarios-listAllUsers-description-200").html(responseUsuarios200_description.substring(responseUsuarios200_description_break));
+                              }
+                            </script>
+
+
+                            <ul id="responses-detail-Usuarios-listAllUsers-200" class="nav nav-tabs nav-tabs-examples" >
+                                <li class="active">
+                                  <a data-toggle="tab" href="#responses-Usuarios-listAllUsers-200-schema">Schema</a>
+                                </li>
+
+
+
+
+                            </ul>
+
+
+                            <div class="tab-content" id="responses-Usuarios-listAllUsers-200-wrapper" style='margin-bottom: 10px;'>
+                              <div class="tab-pane active" id="responses-Usuarios-listAllUsers-200-schema">
+                                <div id="responses-Usuarios-listAllUsers-schema-200" class="exampleStyle">
+                                  <script>
+                                    $(document).ready(function() {
+                                      var schemaWrapper = {
+  "description" : "OK",
+  "content" : {
+    "*/*" : {
+      "schema" : {
+        "type" : "object"
+      }
+    }
+  }
+};
+                                      var schema = findNode('schema',schemaWrapper).schema;
+                                      if (!schema) {
+                                        schema = schemaWrapper.schema;
+                                      }
+                                      if (schema == null) {
+                                        return;
+                                      }
+                                      if (schema.$ref != null) {
+                                        schema = defsParser.$refs.get(schema.$ref);
+                                        if (schema.properties != null) {
+                                          Object.keys(schema.properties).forEach( (item) => {
+                                            if (schema.properties[item].$ref != null) {
+                                              schema.properties[item] = defsParser.$refs.get(schema.properties[item].$ref);
+                                            }
+                                          });
+                                        }
+                                      } else if (schema.items != null && schema.items.$ref != null) {
+                                        schema.items = defsParser.$refs.get(schema.items.$ref);
+                                      } else {
+                                        schemaWrapper.definitions = Object.assign({}, defs);
+                                        $RefParser.dereference(schemaWrapper).catch(function(err) {
+                                          console.log(err);
+                                        });
+                                      }
+
+                                      var view = new JSONSchemaView(schema, 3);
+                                      $('#responses-Usuarios-listAllUsers-200-schema-data').val(JSON.stringify(schema));
+                                      var result = $('#responses-Usuarios-listAllUsers-schema-200');
+                                      result.empty();
+                                      result.append(view.render());
+                                    });
+                                  </script>
+                                </div>
+                                <input id='responses-Usuarios-listAllUsers-200-schema-data' type='hidden' value=''></input>
                               </div>
                             </div>
                         </article>
