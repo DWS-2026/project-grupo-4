@@ -420,7 +420,7 @@ Diagrama actualizado incluyendo los @RestController y su relación con los @Serv
 
 ### **Participación de Miembros en la Práctica 3**
 
-#### **Alumno 1 - [Hugo Rus González]**
+#### **Alumno 1 - Hugo Rus González**
 
 Me he encargado de implementar la capa de seguridad principal de la aplicación, configurando Spring Security y la autenticación mediante JWT para la API REST. He desarrollado los DTOs. Además, he implementado la paginación en todos los controladores REST, he integrado la protección contra ataques XSS mediante el uso de Jsoup y he gestionado los endpoints de imágenes para diversas entidades. También me he encargado del vídeo.
 
@@ -434,7 +434,7 @@ Me he encargado de implementar la capa de seguridad principal de la aplicación,
 
 ---
 
-#### **Alumno 2 - [Nombre Completo]**
+#### **Alumno 2 - David Gutiérrez Oviedo**
 
 Creación y securización de todo aquello relacionado con las reviews, asi como ayudar a ciertos endpoints de la api y diversos rest conroler
 | Nº    | Commits      | Files      |
@@ -447,7 +447,7 @@ Creación y securización de todo aquello relacionado con las reviews, asi como 
 
 ---
 
-#### **Alumno 3 - [Nerea Sanz Sobrados]**
+#### **Alumno 3 - Nerea Sanz Sobrados**
 
 He dasarroyado y securizado principalmente el UserRestController, el UserAuthenticationController, el UserDTO, el UserMapper, el texto en riquecido y la validación de subida de imágenes. Además, también he colaborado con otras partes de la práctica.
 
@@ -461,14 +461,14 @@ He dasarroyado y securizado principalmente el UserRestController, el UserAuthent
 
 ---
 
-#### **Alumno 4 - [Nombre Completo]**
+#### **Alumno 4 - Mari Luz Charfolé Maestro**
 
-[Descripción de las tareas y responsabilidades principales del alumno en el proyecto]
+He realizado el TravelRestController y también le he securizado. Además, también programé su DTO y Mapper. Por otro lado, también me he encargado de la creación del FileStorageService y de todos los endpoints relacionados con ficheros y parte de los de imágenes. También me he encargado de dar permisos de admin en la gran mayoría de endpoints de todas las entidades.
 
 | Nº    | Commits      | Files      |
 |:------------: |:------------:| :------------:|
-|1| [Descripción commit 1](URL_commit_1)  | [Archivo1](URL_archivo_1)   |
-|2| [Descripción commit 2](URL_commit_2)  | [Archivo2](URL_archivo_2)   |
-|3| [Descripción commit 3](URL_commit_3)  | [Archivo3](URL_archivo_3)   |
-|4| [Descripción commit 4](URL_commit_4)  | [Archivo4](URL_archivo_4)   |
-|5| [Descripción commit 5](URL_commit_5)  | [Archivo5](URL_archivo_5)   |
+|1| [Creation of TravelRestController](https://github.com/DWS-2026/project-grupo-4/commit/abfe0fcf9f163f6f09fb6105ffc7b49413f5f3c8), [Update TravelRestController](https://github.com/DWS-2026/project-grupo-4/commit/de638133ebb7be5df2cd192b58c79c6baa9c5bb7)  | [TravelRestController.java](https://github.com/DWS-2026/project-grupo-4/blob/main/vs-nextjourney/src/main/java/es/nextjourney/vs_nextjourney/controller/TravelRestController.java)   |
+|2| [Creation FileStorageService](https://github.com/DWS-2026/project-grupo-4/commit/227c6f7087e7dcd936a48a626588bd874a1f3ae9#diff-9b84fbb3064f43882ea4fc4399a5fbf3c615eef03afb90e62ec81757661d2f17)  | [FileStorageService.java](https://github.com/DWS-2026/project-grupo-4/blob/main/vs-nextjourney/src/main/java/es/nextjourney/vs_nextjourney/service/FileStorageService.java)   |
+|3| [Creation of uploading files endpoints in web](https://github.com/DWS-2026/project-grupo-4/commit/37f2ded2c2e2b3f355eb3d029720751871a7f167#diff-e72edf8085b80332dd7798d172f7de95cc036aa041ba69c104b5e788bac687b3), [Creation of uploading files endpoints in API](https://github.com/DWS-2026/project-grupo-4/commit/c2b9b161ff4793064cb863179fa4a53396546592)  | [TravelWebController.java](https://github.com/DWS-2026/project-grupo-4/blob/main/vs-nextjourney/src/main/java/es/nextjourney/vs_nextjourney/controller/TravelWebController.java), [TravelRestController.java](https://github.com/DWS-2026/project-grupo-4/blob/main/vs-nextjourney/src/main/java/es/nextjourney/vs_nextjourney/controller/TravelRestController.java)   |
+|4| [Permissions for admin in travel](https://github.com/DWS-2026/project-grupo-4/commit/5d4e175526326a9b4c1ccb220b4ff441ff85b2ad), [Permissions for admin in travel 2](https://github.com/DWS-2026/project-grupo-4/commit/04c19529a530a9fce606d506458735afcb5621ba), [Permissions for admin in destination](https://github.com/DWS-2026/project-grupo-4/commit/35d8945c48a1474f05cc26c893a452bdc120e990), [Permissions for admin in reviews](https://github.com/DWS-2026/project-grupo-4/commit/906ec3c2afffaa3712c8b76c1c196f45b95bb263) | [TravelRestController.java](https://github.com/DWS-2026/project-grupo-4/blob/main/vs-nextjourney/src/main/java/es/nextjourney/vs_nextjourney/controller/TravelRestController.java), [DestinationRestController.java](https://github.com/DWS-2026/project-grupo-4/blob/main/vs-nextjourney/src/main/java/es/nextjourney/vs_nextjourney/controller/DestinationRestController.java), [ReviewRestController.java](https://github.com/DWS-2026/project-grupo-4/blob/main/vs-nextjourney/src/main/java/es/nextjourney/vs_nextjourney/controller/ReviewRestController.java), [Archivo5](URL_archivo_5)   |
+|5| [Security patches for XSS in travels](https://github.com/DWS-2026/project-grupo-4/commit/7c7caab23a6af7cb958b06a6c782fd0a045c70e0), [Security changes in travelRestController](https://github.com/DWS-2026/project-grupo-4/commit/48f1730b7592f1d44fac98a9ef1f4de12c64e4e1), [More security changes](https://github.com/DWS-2026/project-grupo-4/commit/44ecba35bc05cfae44b94e08dc115ef299fbaf4b), [More security changes 2](https://github.com/DWS-2026/project-grupo-4/commit/b3b409fdc3af79a7d35249739454186401b0c07a)  | [TravelRestController.java](https://github.com/DWS-2026/project-grupo-4/blob/main/vs-nextjourney/src/main/java/es/nextjourney/vs_nextjourney/controller/TravelRestController.java), [TravelWebController.java](https://github.com/DWS-2026/project-grupo-4/blob/main/vs-nextjourney/src/main/java/es/nextjourney/vs_nextjourney/controller/TravelWebController.java)   |
