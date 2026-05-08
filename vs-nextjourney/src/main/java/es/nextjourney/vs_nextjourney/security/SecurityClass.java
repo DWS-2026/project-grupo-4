@@ -190,6 +190,8 @@ public class SecurityClass {
                         .requestMatchers(HttpMethod.PUT, "/api/v1/destinations/*/places/**").hasRole("ADMIN")
                         .requestMatchers(HttpMethod.DELETE, "/api/v1/destinations/*/places/**").hasRole("ADMIN")
                         .requestMatchers(HttpMethod.PUT, "/api/v1/images/**").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.GET, "/api/v1/users/profiles").hasRole("ADMIN")
+
 
                         .anyRequest().denyAll()
 
