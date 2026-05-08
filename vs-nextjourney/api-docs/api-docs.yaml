@@ -2,7 +2,7 @@ openapi: 3.1.0
 info:
   title: NextJourney REST API
   description: "API REST de NextJourney para gestionar usuarios, destinos, viajes,\
-    \ imágenes y reseñas."
+    \ imágenes y reseñas"
   version: v1
 servers:
 - url: https://localhost:8443
@@ -1266,6 +1266,11 @@ components:
           format: int32
         pageable:
           $ref: "#/components/schemas/PageableObject"
+        sort:
+          $ref: "#/components/schemas/SortObject"
+        numberOfElements:
+          type: integer
+          format: int32
         first:
           type: boolean
         last:
@@ -1278,11 +1283,6 @@ components:
           items:
             $ref: "#/components/schemas/TravelDTO"
         number:
-          type: integer
-          format: int32
-        sort:
-          $ref: "#/components/schemas/SortObject"
-        numberOfElements:
           type: integer
           format: int32
         empty:
@@ -1298,13 +1298,13 @@ components:
         pageSize:
           type: integer
           format: int32
+        sort:
+          $ref: "#/components/schemas/SortObject"
         unpaged:
           type: boolean
         offset:
           type: integer
           format: int64
-        sort:
-          $ref: "#/components/schemas/SortObject"
     SortObject:
       type: object
       properties:
@@ -1325,6 +1325,11 @@ components:
           format: int32
         pageable:
           $ref: "#/components/schemas/PageableObject"
+        sort:
+          $ref: "#/components/schemas/SortObject"
+        numberOfElements:
+          type: integer
+          format: int32
         first:
           type: boolean
         last:
@@ -1337,11 +1342,6 @@ components:
           items:
             $ref: "#/components/schemas/ReviewDTO"
         number:
-          type: integer
-          format: int32
-        sort:
-          $ref: "#/components/schemas/SortObject"
-        numberOfElements:
           type: integer
           format: int32
         empty:
@@ -1357,6 +1357,11 @@ components:
           format: int32
         pageable:
           $ref: "#/components/schemas/PageableObject"
+        sort:
+          $ref: "#/components/schemas/SortObject"
+        numberOfElements:
+          type: integer
+          format: int32
         first:
           type: boolean
         last:
@@ -1369,11 +1374,6 @@ components:
           items:
             $ref: "#/components/schemas/PlaceDTO"
         number:
-          type: integer
-          format: int32
-        sort:
-          $ref: "#/components/schemas/SortObject"
-        numberOfElements:
           type: integer
           format: int32
         empty:
@@ -1389,6 +1389,11 @@ components:
           format: int32
         pageable:
           $ref: "#/components/schemas/PageableObject"
+        sort:
+          $ref: "#/components/schemas/SortObject"
+        numberOfElements:
+          type: integer
+          format: int32
         first:
           type: boolean
         last:
@@ -1401,11 +1406,6 @@ components:
           items:
             $ref: "#/components/schemas/DestinationDTO"
         number:
-          type: integer
-          format: int32
-        sort:
-          $ref: "#/components/schemas/SortObject"
-        numberOfElements:
           type: integer
           format: int32
         empty:

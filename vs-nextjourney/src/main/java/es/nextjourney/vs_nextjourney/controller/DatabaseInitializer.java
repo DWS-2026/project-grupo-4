@@ -45,7 +45,6 @@ public class DatabaseInitializer {
 			admin.setRoles(List.of("ADMIN"));
 
 			userRepository.save(admin);
-
 		};
 	}
 

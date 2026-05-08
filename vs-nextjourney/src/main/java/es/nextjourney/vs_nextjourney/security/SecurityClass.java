@@ -75,6 +75,9 @@ public class SecurityClass {
 
                 .authorizeHttpRequests(auth -> auth
 
+                        .requestMatchers("/v3/api-docs/**", "/swagger-ui/**", "/swagger-ui.html", "/v3/api-docs.yaml").permitAll()
+
+
                         // Admin-only pages
                         .requestMatchers("/admin/**", "/admin_users", "/admin_users/**",
                                 "/destinations/*/places/*/edit", "/destinations/*/edit", "/destinations/*/delete",

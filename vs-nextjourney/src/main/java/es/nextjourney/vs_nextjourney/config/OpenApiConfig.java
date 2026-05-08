@@ -13,7 +13,7 @@ import org.springframework.context.annotation.Configuration;
 @OpenAPIDefinition(info = @Info(
 	title = "NextJourney REST API",
 	version = "v1",
-	description = "API REST de NextJourney para gestionar usuarios, destinos, viajes, imágenes y reseñas."))
+	description = "API REST de NextJourney para gestionar usuarios, destinos, viajes, imágenes y reseñas"))
 @SecurityScheme(
 	name = "bearerAuth",
 	type = SecuritySchemeType.HTTP,
